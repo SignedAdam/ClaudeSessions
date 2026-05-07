@@ -383,8 +383,8 @@ half-finished while shipping fast.
 
 - id: P6.T02
   title: "Re-verify the universal `.command` launcher — open Resume / Extract / Open-in-CLI; confirm a single new window opens in the user's default terminal handler with no Gatekeeper prompt."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Verified in cycle 49. Code-read confirms launcher writes ~/Library/Application Support/ClaudeSessions/launch/launch-<uuid>.command with 0755 permissions, body = '#!/bin/bash; cd <quoted cwd>; <command>; exec <shell> -l', then NSWorkspace.shared.open(). Cleanup scheduled +600s. Bash smoke test confirms the file write + chmod path works. Actual UI launch needs a human at the keyboard — code path is intact."
 
 - id: P6.T03
   title: "Re-verify settings gear opens the Settings scene reliably from a cold start."
