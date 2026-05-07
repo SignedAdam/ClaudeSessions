@@ -20,6 +20,7 @@ struct SessionRow: View {
     let onArchive: () -> Void
     let onMoveToProject: () -> Void
     let onDelete: () -> Void
+    let onShowVersions: () -> Void
 
     @State private var hovered = false
 
@@ -91,6 +92,7 @@ struct SessionRow: View {
         .contextMenu {
             Button(isFavorite ? "Unstar" : "Star", action: onToggleFavorite)
             Button(isHidden ? "Unhide" : "Hide", action: onToggleHidden)
+            Button("Versions…", action: onShowVersions)
             Button("Archive", action: onArchive)
             Button("Copy to Project…", action: onMoveToProject)
 

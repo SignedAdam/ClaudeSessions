@@ -63,6 +63,9 @@ struct SidebarView: View {
                             },
                             onDeleteSession: { session in
                                 appState.requestDeleteSession(session)
+                            },
+                            onShowVersions: { session in
+                                appState.presentVersions(for: session)
                             }
                         )
                     }
@@ -109,6 +112,9 @@ struct SidebarView: View {
                                 },
                                 onDeleteSession: { session in
                                     appState.requestDeleteSession(session)
+                                },
+                                onShowVersions: { session in
+                                    appState.presentVersions(for: session)
                                 }
                             )
                         }
@@ -241,6 +247,7 @@ struct FavoritesSection: View {
     let onArchiveSession: (SessionInfo) -> Void
     let onMoveSession: (SessionInfo) -> Void
     let onDeleteSession: (SessionInfo) -> Void
+    let onShowVersions: (SessionInfo) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -281,7 +288,8 @@ struct FavoritesSection: View {
                             onToggleFavorite: { onToggleFavorite(session) },
                             onArchive: { onArchiveSession(session) },
                             onMoveToProject: { onMoveSession(session) },
-                            onDelete: { onDeleteSession(session) }
+                            onDelete: { onDeleteSession(session) },
+                            onShowVersions: { onShowVersions(session) }
                         )
                     }
                 }
@@ -315,6 +323,7 @@ struct ProjectSection: View {
     let onArchiveSession: (SessionInfo) -> Void
     let onMoveSession: (SessionInfo) -> Void
     let onDeleteSession: (SessionInfo) -> Void
+    let onShowVersions: (SessionInfo) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -365,7 +374,8 @@ struct ProjectSection: View {
                             onToggleFavorite: { onToggleSessionFavorite(session) },
                             onArchive: { onArchiveSession(session) },
                             onMoveToProject: { onMoveSession(session) },
-                            onDelete: { onDeleteSession(session) }
+                            onDelete: { onDeleteSession(session) },
+                            onShowVersions: { onShowVersions(session) }
                         )
 
                         // Indented subagent rows that ran under this session
@@ -386,7 +396,8 @@ struct ProjectSection: View {
                                     onToggleFavorite: { onToggleSessionFavorite(sub) },
                                     onArchive: { onArchiveSession(sub) },
                                     onMoveToProject: { onMoveSession(sub) },
-                                    onDelete: { onDeleteSession(sub) }
+                                    onDelete: { onDeleteSession(sub) },
+                                    onShowVersions: { onShowVersions(sub) }
                                 )
                             }
                         }

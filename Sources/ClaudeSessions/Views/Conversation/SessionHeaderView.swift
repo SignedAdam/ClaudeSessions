@@ -66,6 +66,21 @@ struct SessionHeaderView: View {
                             .foregroundStyle(Theme.textTertiary)
                     }
 
+                    if let s = sessionInfo {
+                        Button {
+                            appState.presentVersions(for: s)
+                        } label: {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundStyle(Theme.textTertiary)
+                                .frame(width: 22, height: 22)
+                                .background(Theme.surface2.opacity(0.6))
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                        }
+                        .buttonStyle(.plain)
+                        .help("Versions · browse, diff, and restore previous on-disk versions of this session")
+                    }
+
                     Button {
                         appState.closeCurrentSession()
                     } label: {

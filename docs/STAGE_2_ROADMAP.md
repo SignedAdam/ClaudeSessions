@@ -473,8 +473,8 @@ Confirmed live on this machine: 2 sessions in saves backups, BackupEngine mirror
 
 - id: P7.T06
   title: "Wire entry points — 'Versions…' menu item in the session-row context menu, + a 'Versions' button in SessionHeaderView's right-side cluster. Sets appState.versionsContext and presents the sheet."
-  status: queued
-  notes: "Match the pattern Archive / Backup Vault use for sheet presentation."
+  status: done
+  notes: "Done in cycle 59. AppState.VersionsContext + presentVersions(for:) (resolves slug + cwd via SlugResolver). Sheet wired into ContentView via .sheet(item:). Session row context menu gained 'Versions…' item — plumbed through onShowVersions closure across SessionRow/FavoritesSection/ProjectSection. SessionHeaderView gained a clock.arrow.circlepath button next to the close button. **Phase 7 complete.**"
 
 ---
 

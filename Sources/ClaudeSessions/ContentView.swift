@@ -95,6 +95,20 @@ struct ContentView: View {
                 .environmentObject(appState)
                 .environmentObject(themeStore)
         }
+        .sheet(item: $appState.versionsContext) { ctx in
+            VersionsView(
+                sessionId: ctx.sessionId,
+                projectSlug: ctx.projectSlug,
+                projectCwd: ctx.projectCwd,
+                sessionTitle: ctx.sessionTitle,
+                isPresented: Binding(
+                    get: { appState.versionsContext != nil },
+                    set: { if !$0 { appState.versionsContext = nil } }
+                )
+            )
+            .environmentObject(appState)
+            .environmentObject(themeStore)
+        }
         .alert(
             "Move this conversation to Trash?",
             isPresented: Binding(

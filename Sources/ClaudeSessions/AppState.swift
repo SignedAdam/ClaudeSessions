@@ -37,11 +37,22 @@ final class AppState: ObservableObject {
     @Published var showExportSheet = false
     @Published var showSearchSheet = false
     @Published var moveSessionContext: MoveSessionContext?
+    @Published var versionsContext: VersionsContext?
 
     struct MoveSessionContext: Identifiable {
         let id = UUID()
         let session: SessionInfo
         let sourceProject: Project
+    }
+
+    /// Drives the Versions sheet (P7) — captures everything VersionsView
+    /// needs to list versions for a session and restore one as new.
+    struct VersionsContext: Identifiable {
+        let id = UUID()
+        let sessionId: String
+        let sessionTitle: String
+        let projectSlug: String?
+        let projectCwd: String?
     }
 
     // Settings (AppStorage-backed)
@@ -911,6 +922,23 @@ final class AppState: ObservableObject {
     func beginMoveSession(_ session: SessionInfo) {
         guard let project = projects.first(where: { $0.sessions.contains { $0.id == session.id } }) else { return }
         moveSessionContext = MoveSessionContext(session: session, sourceProject: project)
+    }
+
+    // MARK: - Versions sheet (P7.T06)
+
+    /// Open the Versions sheet for a given session. Resolves projectSlug
+    /// and projectCwd via SlugResolver so VersionHistoryService can find
+    /// vault entries and VersionRestoreService can write new sessions.
+    func presentVersions(for session: SessionInfo) {
+        let projectDir = (session.filePath as NSString).deletingLastPathComponent
+        let slug = (projectDir as NSString).lastPathComponent
+        let resolvedCwd = SlugResolver.bestCwd(slug: slug, recorded: session.projectPath)
+        versionsContext = VersionsContext(
+            sessionId: session.id,
+            sessionTitle: session.title,
+            projectSlug: slug,
+            projectCwd: resolvedCwd
+        )
     }
 
     /// Actually copy the session's JSONL into the target project.
