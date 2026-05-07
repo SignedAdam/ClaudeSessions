@@ -265,8 +265,11 @@ struct FavoritesSection: View {
                         .foregroundStyle(Theme.text)
                     Spacer()
                     Text("\(sessions.count)")
-                        .font(.system(size: 9, design: .monospaced))
-                        .foregroundStyle(Theme.textTertiary)
+                        .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(Theme.warnTint)
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Theme.warnTint.opacity(0.14))
+                        .clipShape(Capsule())
                 }
                 .padding(.horizontal, 12).padding(.vertical, 6)
                 .contentShape(Rectangle())

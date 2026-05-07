@@ -554,8 +554,8 @@ of "active" conversations they revisit constantly.
 
 - id: P9.T05
   title: "Favorites count badge in sidebar — small monospaced count next to the 'Favorites' section header so the user can see at a glance how many they've starred."
-  status: queued
-  notes: "Cosmetic. Drop into the existing FavoritesSection header HStack."
+  status: done
+  notes: "Done in cycle 69. The count was already in the FavoritesSection header but rendered identically to project session counts (textTertiary, no background). Upgraded to a small warnTint pill (warnTint text on warnTint @ 14% bg, capsule clip, semibold). It now reads as a *starred count* — visually paired with the star icon, distinct from generic project counts."
 
 ---
 
