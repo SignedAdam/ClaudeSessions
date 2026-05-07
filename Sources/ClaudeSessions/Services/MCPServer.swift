@@ -55,17 +55,19 @@ final class MCPServer {
         self.port = port
     }
 
-    /// Start the listener. If the chosen port is in use, falls back to
-    /// an ephemeral port and updates `self.port`.
-    func start() throws {
+    /// Start the listener. Pass `port` to override the configured one.
+    /// Falls back to an ephemeral port if the chosen one is in use, and
+    /// updates `self.port` to the bound value.
+    func start(port: UInt16? = nil) throws {
         guard listener == nil else { return }
+        if let port { self.port = port }
 
         let parameters = NWParameters.tcp
         parameters.allowLocalEndpointReuse = true
         // Bind to loopback only.
         parameters.requiredLocalEndpoint = NWEndpoint.hostPort(
             host: .ipv4(.loopback),
-            port: NWEndpoint.Port(rawValue: port) ?? .any
+            port: NWEndpoint.Port(rawValue: self.port) ?? .any
         )
 
         let l = try NWListener(using: parameters)

@@ -241,8 +241,8 @@ with my prompt 'continue from here'" — and Claude does it via our app.
 
 - id: P3.T07
   title: "Setting: MCP server enable/disable + port + show the install instructions."
-  status: queued
-  notes: "Settings tab, with a 'copy snippet' button for the user's `~/.claude/settings.json` MCP config."
+  status: done
+  notes: "Done in cycle 39. New MCPSettingsView tab with enable toggle (status: 'Running on http://127.0.0.1:7531/mcp' or 'Stopped'), port field with validation (1024–65535), copy-snippet button for ~/.claude/settings.json, and a tools-list reference. AppState.setMCPEnabled / restartMCPServer / startMCPServer methods. mcpServer.start() updated to take an optional port. **Phase 3 complete.**"
 
 ---
 

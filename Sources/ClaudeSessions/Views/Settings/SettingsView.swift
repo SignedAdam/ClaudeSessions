@@ -17,6 +17,9 @@ struct SettingsView: View {
             ClaudeCodeSettingsView()
                 .tabItem { Label("Claude Code", systemImage: "gearshape.2") }
 
+            MCPSettingsView()
+                .tabItem { Label("MCP", systemImage: "antenna.radiowaves.left.and.right") }
+
             AISearchSettingsView()
                 .tabItem { Label("AI Search", systemImage: "magnifyingglass") }
 

@@ -101,6 +101,8 @@ final class AppState: ObservableObject {
     let mcpServer = MCPServer()  // tools registered & started in P3.T03+
 
     @AppStorage("continuousBackupEnabled") var continuousBackupEnabled: Bool = true
+    @AppStorage("mcpServerEnabled") var mcpServerEnabled: Bool = false
+    @AppStorage("mcpServerPort") var mcpServerPort: Int = 7531
 
     private var conversationCache: [String: CachedConversation] = [:]
     private let maxCacheSize = 10
@@ -130,9 +132,38 @@ final class AppState: ObservableObject {
             backupEngine.start()
         }
         // Register MCP tools after init so closures can capture self.
-        // The server itself is started lazily by the Settings toggle (P3.T07).
+        // Then start the server if the user has enabled it.
         DispatchQueue.main.async { [weak self] in
-            self?.bootstrapMCPTools()
+            guard let self else { return }
+            self.bootstrapMCPTools()
+            if self.mcpServerEnabled {
+                self.startMCPServer()
+            }
+        }
+    }
+
+    /// Mirror the MCP server's lifecycle to user preference. Called from
+    /// Settings → MCP toggle and on launch.
+    func setMCPEnabled(_ enabled: Bool) {
+        mcpServerEnabled = enabled
+        if enabled { startMCPServer() }
+        else       { mcpServer.stop() }
+    }
+
+    /// Restart with the currently-saved port. Used when the user changes
+    /// the port field in Settings.
+    func restartMCPServer() {
+        mcpServer.stop()
+        if mcpServerEnabled { startMCPServer() }
+    }
+
+    private func startMCPServer() {
+        let port = UInt16(clamping: mcpServerPort)
+        do {
+            try mcpServer.start(port: port)
+        } catch {
+            showToast("MCP server failed: \(error.localizedDescription)")
+            mcpServerEnabled = false
         }
     }
 
