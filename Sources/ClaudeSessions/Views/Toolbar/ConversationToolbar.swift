@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ConversationToolbar: View {
     @EnvironmentObject var appState: AppState
+    @Environment(\.openSettings) private var openSettingsAction
 
     var body: some View {
         HStack(spacing: 8) {
@@ -68,7 +69,7 @@ struct ConversationToolbar: View {
                         appState.showExportSheet = true
                     }
                     Button("Change default in Settings…") {
-                        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                        openSettingsAction()
                     }
                 }
 

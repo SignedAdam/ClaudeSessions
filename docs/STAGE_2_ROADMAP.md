@@ -388,8 +388,8 @@ half-finished while shipping fast.
 
 - id: P6.T03
   title: "Re-verify settings gear opens the Settings scene reliably from a cold start."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Verified in cycle 50. BottomBarView already uses @Environment(\\.openSettings) (cycle 17). Found a leftover NSApp.sendAction(showSettingsWindow:) path in ConversationToolbar's 'Change default in Settings…' button — the same broken path the user complained about. Converted to @Environment(\\.openSettings). All open-settings call sites now unified."
 
 - id: P6.T04
   title: "Strip leftover debug `print` statements (e.g. the `[Forker]` continueFrom logs) once truncation is confirmed working."
