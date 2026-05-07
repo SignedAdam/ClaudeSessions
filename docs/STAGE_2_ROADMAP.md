@@ -598,8 +598,8 @@ session — today they hide unless you expand the parent.
 
 - id: P10.T05
   title: "Build subagent index — a flat `[SubagentIndexEntry]` derived from all scanned projects. Each entry: subagent SessionInfo, parent SessionInfo, project, modified date, message count, agent name (parsed from agent-<NAME>-<uuid>.jsonl filename if available)."
-  status: queued
-  notes: "Pure computed-property over `appState.projects`. No new I/O. Derived on demand. Sort by modified desc by default."
+  status: done
+  notes: "Done in cycle 75. Sources/ClaudeSessions/Services/SubagentIndex.swift defines SubagentIndexEntry (id, subagent, parent, project, agentName) and an enum-namespace SubagentIndex.build(from: [Project]) -> [SubagentIndexEntry] that flattens every parent's .subagents and sorts modified desc. Composite id `<projectId>::<parentId>::<subId>` for ForEach stability. extractAgentName handles `agent-<NAME>-<uuid>.jsonl` by stripping the `agent-` prefix and 5 trailing dash-separated UUID parts; returns nil if the filename doesn't conform. T06 (browser view) consumes this directly."
 
 - id: P10.T06
   title: "Subagents browser view — new top-level view (sibling to HomeDashboardView / ArchiveView). Lists every subagent run, filterable by free-text (matches title, parent title, project name, agent name). Click → opens that subagent session in the conversation pane."
