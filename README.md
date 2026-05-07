@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/screenshot-reading-stellar.png" alt="Claude Sessions screenshot" width="920">
+  <img src="docs/images/hero.png" alt="Claude Sessions" width="920">
 </p>
 
 <h1 align="center">Claude Sessions</h1>
