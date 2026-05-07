@@ -1064,10 +1064,18 @@ final class AppState: ObservableObject {
                 switch outcome {
                 case .success:
                     self.showToast("Sent · waiting for Claude…")
-                case .failure(let code, let stderr):
-                    let trimmed = stderr.trimmingCharacters(in: .whitespacesAndNewlines)
-                    let detail = trimmed.isEmpty ? "exit \(code)" : trimmed.split(separator: "\n").last.map(String.init) ?? trimmed
-                    self.showToast("claude failed: \(detail)")
+                case .failure(let code, let stderr, let stdout):
+                    // `claude -p` writes to stderr OR stdout depending on the
+                    // failure mode — surface whichever has content. Print the
+                    // full thing for `Console.app`-level debugging.
+                    print("[claude -p exit \(code)] stderr=\(stderr) stdout=\(stdout)")
+                    let trimmedErr = stderr.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let trimmedOut = stdout.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let primary = !trimmedErr.isEmpty ? trimmedErr
+                                : !trimmedOut.isEmpty ? trimmedOut
+                                : "exit \(code)"
+                    let lastLine = primary.split(separator: "\n").last.map(String.init) ?? primary
+                    self.showToast("claude failed: \(lastLine)")
                 case .cancelled:
                     self.showToast("Stopped")
                 case .launchFailed(let reason):

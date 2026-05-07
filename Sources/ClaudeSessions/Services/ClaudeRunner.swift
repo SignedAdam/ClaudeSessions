@@ -16,7 +16,9 @@ final class ClaudeRunner: @unchecked Sendable {
 
     enum RunOutcome {
         case success(stdout: String)
-        case failure(exitCode: Int32, stderr: String)
+        /// `claude` exited non-zero. Both streams are reported because
+        /// `claude -p` often writes the actual error to stdout.
+        case failure(exitCode: Int32, stderr: String, stdout: String)
         case cancelled
         case launchFailed(String)
     }
@@ -89,7 +91,9 @@ final class ClaudeRunner: @unchecked Sendable {
                 } else if code == 0 {
                     continuation.resume(returning: .success(stdout: stdout))
                 } else {
-                    continuation.resume(returning: .failure(exitCode: code, stderr: stderr))
+                    continuation.resume(returning: .failure(exitCode: code,
+                                                            stderr: stderr,
+                                                            stdout: stdout))
                 }
             }
         }
