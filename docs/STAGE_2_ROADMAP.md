@@ -468,8 +468,8 @@ Confirmed live on this machine: 2 sessions in saves backups, BackupEngine mirror
 
 - id: P7.T05
   title: "Restore-as-new-session — given a version, write its JSONL into the source project as a fresh sessionId. Reuses SessionCreator. Original is never modified; the restored copy gets `· restored from <ts>` in its title."
-  status: queued
-  notes: "BackupVaultService.restore() exists for the vault case but writes to the same sessionId. We need a copy-as-new variant that always assigns a new id."
+  status: done
+  notes: "Done in cycle 58. New VersionRestoreService.swift — reads version JSONL, rewrites top-level sessionId on every line + on custom-title entries, registers via SessionCreator. AppState.restoreVersion(...) wires service. VersionsView gained a projectCwd init param + confirmation alert + stageRestore/performRestore. Restore button now functional, disabled if no projectCwd."
 
 - id: P7.T06
   title: "Wire entry points — 'Versions…' menu item in the session-row context menu, + a 'Versions' button in SessionHeaderView's right-side cluster. Sets appState.versionsContext and presents the sheet."

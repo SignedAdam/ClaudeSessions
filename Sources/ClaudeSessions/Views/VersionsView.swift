@@ -10,6 +10,7 @@ import AppKit
 struct VersionsView: View {
     let sessionId: String
     let projectSlug: String?
+    let projectCwd: String?       // resolved cwd, needed for Restore writes
     let sessionTitle: String
     @Binding var isPresented: Bool
 
@@ -18,6 +19,7 @@ struct VersionsView: View {
     @State private var selected: Set<String> = []
     @State private var loading: Bool = true
     @State private var diffPair: (VersionHistoryService.Version, VersionHistoryService.Version)?
+    @State private var pendingRestore: VersionHistoryService.Version?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -40,6 +42,15 @@ struct VersionsView: View {
                                 set: { if !$0 { diffPair = nil } }
                             ))
                 .environmentObject(appState)
+        }
+        .alert("Restore this version as a new session?", isPresented: Binding(
+            get: { pendingRestore != nil },
+            set: { if !$0 { pendingRestore = nil } }
+        ), presenting: pendingRestore) { v in
+            Button("Restore") { performRestore(v) }
+            Button("Cancel", role: .cancel) { pendingRestore = nil }
+        } message: { v in
+            Text("Writes a fresh JSONL into the project with a new session id. The original version file is left untouched. The restored copy will appear in the sidebar as `\(sessionTitle) · restored from <ts>`.")
         }
     }
 
@@ -131,11 +142,9 @@ struct VersionsView: View {
             Button("Diff") { presentDiff() }
                 .controlSize(.small)
                 .disabled(selected.count != 2)
-            Button("Restore as new…") {
-                appState.showToast("Restore coming in T05")
-            }
-            .controlSize(.small)
-            .disabled(selected.count != 1)
+            Button("Restore as new…") { stageRestore() }
+                .controlSize(.small)
+                .disabled(selected.count != 1 || projectCwd == nil)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -247,6 +256,22 @@ struct VersionsView: View {
         let pair = versions.filter { selected.contains($0.id) }
         guard pair.count == 2 else { return }
         diffPair = (pair[0], pair[1])
+    }
+
+    private func stageRestore() {
+        guard let id = selected.first,
+              let v = versions.first(where: { $0.id == id }) else { return }
+        pendingRestore = v
+    }
+
+    private func performRestore(_ version: VersionHistoryService.Version) {
+        pendingRestore = nil
+        guard let cwd = projectCwd else {
+            appState.showToast("Cannot determine project directory")
+            return
+        }
+        appState.restoreVersion(version, projectCwd: cwd, originalTitle: sessionTitle)
+        isPresented = false
     }
 
     private func revealSelected() {

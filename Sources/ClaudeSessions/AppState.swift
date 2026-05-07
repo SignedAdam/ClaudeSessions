@@ -567,6 +567,26 @@ final class AppState: ObservableObject {
     }
 
     /// Continue from a specific message: fork the conversation truncated up
+    /// Restore a version from the Versions sheet as a new session under the
+    /// same project. Original version file is never modified; we read it,
+    /// rewrite sessionId on every entry to a new UUID, and write it back
+    /// into ~/.claude/projects/<slug>/<newId>.jsonl. Title gets a
+    /// "· restored from <ts>" suffix so the user can tell them apart.
+    func restoreVersion(_ version: VersionHistoryService.Version,
+                        projectCwd: String,
+                        originalTitle: String) {
+        let restorer = VersionRestoreService()
+        do {
+            let r = try restorer.restore(version: version,
+                                         projectCwd: projectCwd,
+                                         originalTitle: originalTitle)
+            showToast("Restored as \(r.title)")
+            Task { await loadProjects() }
+        } catch {
+            showToast("Restore failed: \(error.localizedDescription)")
+        }
+    }
+
     /// to and including this message, write it as a new JSONL session, and
     /// open `claude --resume` against it. The original is untouched.
     func continueFromMessage(id messageId: String) {
@@ -601,8 +621,7 @@ final class AppState: ObservableObject {
             showToast("Forked at message · opening Claude Code…")
             ProcessLauncher.resumeSession(
                 sessionId: created.sessionId,
-                cwd: created.projectCwd,
-                displayName: title
+                cwd: created.projectCwd
             )
             Task { await loadProjects() }
         } catch {
@@ -644,8 +663,7 @@ final class AppState: ObservableObject {
             showToast("Created clean session · opening Claude Code…")
             ProcessLauncher.resumeSession(
                 sessionId: created.sessionId,
-                cwd: created.projectCwd,
-                displayName: title
+                cwd: created.projectCwd
             )
 
             // Refresh sidebar so the new session appears
