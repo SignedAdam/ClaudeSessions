@@ -549,8 +549,8 @@ of "active" conversations they revisit constantly.
 
 - id: P9.T04
   title: "Star toggle micro-interaction — when the user clicks the star, animate the icon (scale 1.0→1.2→1.0 + brief warnTint flash for star, dim for unstar). Adds delight without changing behavior."
-  status: queued
-  notes: "Adds to SessionRow's existing star button. ~10 lines of animation modifiers."
+  status: done
+  notes: "Done in cycle 68. Added `.symbolEffect(.bounce, value: isFavorite)` and `.contentTransition(.symbolEffect(.replace))` to SessionRow's star button — the SF-native bounce + crossfade-replace fires on both star and unstar. Two lines, zero state, no animation timing to maintain. macOS 14+ only, which matches the app's deployment target."
 
 - id: P9.T05
   title: "Favorites count badge in sidebar — small monospaced count next to the 'Favorites' section header so the user can see at a glance how many they've starred."

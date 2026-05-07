@@ -77,6 +77,8 @@ struct SessionRow: View {
                     Image(systemName: isFavorite ? "star.fill" : "star")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(isFavorite ? Theme.warnTint : Theme.textTertiary)
+                        .symbolEffect(.bounce, value: isFavorite)
+                        .contentTransition(.symbolEffect(.replace))
                 }
                 .buttonStyle(.plain)
                 .opacity(isFavorite ? 1 : (hovered ? 0.7 : 0))
