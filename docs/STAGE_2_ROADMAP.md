@@ -398,8 +398,8 @@ half-finished while shipping fast.
 
 - id: P6.T05
   title: "Polish list at the bottom of `ROADMAP.md` — execute as many of those nits as fit in one cycle."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 52. Deleted unused ExportPromptView (superseded by ExportSheetView). CURRENT.md was already marked superseded. ArchiveView empty state was already styled with archivebox icon + helpful subtext. Other nits (Vellum/iMessage hover audit, animated mode transitions, project rename, stat chip wrap) require visual verification or are feature-sized; deferred to Stage 1's ROADMAP.md polish list. **Phase 6 complete. Stage 2 complete.**"
 
 ---
 
