@@ -256,8 +256,29 @@ and ensure every section is reachable at the default size.
 
 - id: P4.T01
   title: "Audit every settings tab at the default 520×420 size — note every overflow case in the task body (Claude Code tab is known overflowing)."
-  status: queued
-  notes: "Output: list each tab × each viewport that breaks, with screenshots-by-description."
+  status: done
+  notes: "Done in cycle 40. See findings below."
+
+#### Findings (cycle 40 — settings overflow audit)
+
+Window: `.frame(width: 520, height: 420)` on `SettingsView`'s `TabView`. Usable content area after the macOS tab bar (~30pt) and inner padding (~32pt) is **~358pt vertical, ~488pt horizontal**.
+
+| Tab | Status | Notes |
+|---|---|---|
+| **General** | OK | Identity, Terminal, Visibility, Appearance — 4 sections, each ~60–80pt. Fits. |
+| **Extract** | OK | Header + 2 radio options + tip footer. ~250pt. Fits. |
+| **Backup** | **Overflows** | Header (70) + toggle (50) + bootstrap+lowDisk rows (60 conditional) + stats (5 rows × 24 = 120) + location (40) + error row (30 conditional) + "How it works" footer (80). ≈ 390–450pt. The "How it works" footer falls below the visible area; the location row may cut off depending on conditional rows. |
+| **Claude Code** | **Overflows** | Embedded Chat + Cleanup + Model + Telemetry + Raw Access — 5 sections, each header + 1–2 controls + caption. ~120 + 100 + 90 + 60 + 70 = ~440pt before dividers. Last section (raw access) cuts off at default size. User-confirmed earlier in conversation. |
+| **MCP** | OK | Already wrapped in ScrollView (cycle 39) so any overflow gets scrolled. |
+| **AI Search** | OK | Small — API key field + model picker + caption. ~150pt. |
+| **Advanced** | OK | Two TextFields. ~80pt. |
+
+#### What needs to happen in T02–T05
+
+- **T02 (ScrollView wrapper):** apply uniformly to **all** tabs. Cheap, fixes Backup + Claude Code immediately, harmless on the small ones (no scrollbar appears when content fits).
+- **T03 (re-style):** the tabs use Form / native colors and don't match the rest of the app. Switch backgrounds to `Theme.surface`, headings to `Theme.text`, body to `Theme.textSecondary`.
+- **T04 (resize):** bumping the default to 640×520 would let Claude Code fit unscrolled and gives Backup room for the footer. Min size should still allow shrink (the ScrollView from T02 makes that safe).
+- **T05 (dividers + spacing pass):** consistency — Backup uses Form+Sections, Claude Code uses VStack+Divider, Extract uses VStack+spacing only. Pick one pattern. The VStack+Divider+sectionHeader approach in Claude Code/MCP is closest to the rest of the app.
 
 - id: P4.T02
   title: "Wrap every settings tab in a `ScrollView { … }` so any content fits, regardless of vertical size."
