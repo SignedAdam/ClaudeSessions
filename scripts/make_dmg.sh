@@ -119,9 +119,10 @@ echo "==> Cleaning build/"
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
-if [[ ! -f "$ICON_PATH" ]]; then
+ICON_SOURCE="$ROOT_DIR/Resources/AppIcon.png"
+if [[ ! -f "$ICON_PATH" || ( -f "$ICON_SOURCE" && "$ICON_SOURCE" -nt "$ICON_PATH" ) ]]; then
   echo "==> Generating app icon"
-  "$ROOT_DIR/scripts/generate_app_icon.sh" "$ICON_PATH"
+  "$ROOT_DIR/scripts/generate_app_icon.sh" "$ICON_SOURCE" "$ICON_PATH"
 fi
 
 build_swift

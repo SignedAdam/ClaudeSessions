@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/hero.png" alt="Claude Sessions" width="920">
+  <img src="Resources/AppIcon.png" alt="Claude Sessions app icon" width="128" height="128">
 </p>
 
 <h1 align="center">Claude Sessions</h1>
@@ -15,6 +15,10 @@
   <img alt="SwiftUI" src="https://img.shields.io/badge/SwiftUI-native-blue">
   <img alt="Dependencies" src="https://img.shields.io/badge/dependencies-zero-brightgreen">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-gold">
+</p>
+
+<p align="center">
+  <img src="docs/images/hero.png" alt="Claude Sessions" width="920">
 </p>
 
 Claude Code writes everything to JSONL. Good. Then it buries the useful parts under tool calls, snapshots, system events, and cleanup rules.
