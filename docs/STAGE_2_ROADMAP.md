@@ -544,8 +544,8 @@ of "active" conversations they revisit constantly.
 
 - id: P9.T03
   title: "Sidebar Favorites empty state — when the user has 0 favorites, the section currently doesn't render. Add a one-time hint somewhere (sidebar tip below project list? or just keep current behavior?). Decide and ship."
-  status: queued
-  notes: "Default decision: keep hidden when empty. The dashboard hint covers discoverability. Mark this task `skipped` if the audit confirms current behavior is fine."
+  status: skipped
+  notes: "Cycle 67 decision: skip. Discoverability is already covered: (1) every SessionRow has a star button (visible on hover) — that's where the affordance is learned, (2) once a user has any stars, the new dashboard Starred section renders prominently, (3) sidebar Favorites section appears as soon as count > 0. Adding a 'tip' to a working sidebar would be visual noise. Current behavior is correct."
 
 - id: P9.T04
   title: "Star toggle micro-interaction — when the user clicks the star, animate the icon (scale 1.0→1.2→1.0 + brief warnTint flash for star, dim for unstar). Adds delight without changing behavior."
