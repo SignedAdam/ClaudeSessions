@@ -37,49 +37,108 @@ struct GeneralSettingsView: View {
     @EnvironmentObject var themeStore: ThemeStore
 
     var body: some View {
-        Form {
-            Section("Identity") {
-                TextField("Display Name:", text: $displayName)
-                    .help("Shown in message headers for your messages")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                identitySection
+                Divider()
+                terminalSection
+                Divider()
+                visibilitySection
+                Divider()
+                appearanceSection
             }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
 
-            Section("Terminal") {
-                Text("Resume / Extract / Open-in-CLI write a tiny `.command` script and let macOS open it. By default that's Terminal.app. To use a different terminal, right-click any `.command` file in Finder → Open With → Other → choose your terminal → check \"Always Open With\". From then on, every launch from this app opens there.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+    private var identitySection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsSectionHeader("Identity",
+                                  subtitle: "Shown in message headers for your messages.")
+            HStack(spacing: 8) {
+                Text("Display name:")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                TextField("You", text: $displayName)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 220)
+                Spacer()
             }
+        }
+    }
 
-            Section("Visibility") {
-                Toggle(isOn: $hiddenStore.showHidden) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Show hidden conversations")
-                        Text("Reveals items you've marked as hidden. They appear muted + italic.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .toggleStyle(.switch)
+    private var terminalSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsSectionHeader("Terminal",
+                                  subtitle: "Resume / Extract / Open-in-CLI write a tiny `.command` script and let macOS open it.")
+            Text("By default that's Terminal.app. To use a different terminal, right-click any `.command` file in Finder → Open With → Other → choose your terminal → check \"Always Open With\". From then on, every launch from this app opens there.")
+                .font(.system(size: 10))
+                .foregroundStyle(Theme.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
 
-                if !hiddenStore.hiddenSessionIds.isEmpty || !hiddenStore.hiddenProjectIds.isEmpty {
-                    Text("\(hiddenStore.hiddenSessionIds.count) hidden session\(hiddenStore.hiddenSessionIds.count == 1 ? "" : "s"), \(hiddenStore.hiddenProjectIds.count) hidden project\(hiddenStore.hiddenProjectIds.count == 1 ? "" : "s")")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
+    private var visibilitySection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsSectionHeader("Visibility",
+                                  subtitle: "Hidden items are visual-only. The files stay in place; the user can re-show with the eye-slash toggle in the sidebar footer.")
+            Toggle(isOn: $hiddenStore.showHidden) {
+                Text("Show hidden conversations")
+                    .font(.system(size: 12))
             }
+            .toggleStyle(.switch)
+            if !hiddenStore.hiddenSessionIds.isEmpty || !hiddenStore.hiddenProjectIds.isEmpty {
+                Text("\(hiddenStore.hiddenSessionIds.count) hidden session\(hiddenStore.hiddenSessionIds.count == 1 ? "" : "s"), \(hiddenStore.hiddenProjectIds.count) hidden project\(hiddenStore.hiddenProjectIds.count == 1 ? "" : "s")")
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+        }
+    }
 
-            Section("Appearance") {
-                Picker("Theme:", selection: $theme) {
+    private var appearanceSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsSectionHeader("Appearance",
+                                  subtitle: "For palette and ambient-field options, use the paintpalette icon in the bottom bar.")
+            HStack(spacing: 8) {
+                Text("System theme:")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                Picker("", selection: $theme) {
                     Text("System").tag("system")
                     Text("Dark").tag("dark")
                     Text("Light").tag("light")
                 }
-                Text("For palette and ambient-field options, use the paintpalette icon in the bottom bar.")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                .labelsHidden()
+                .frame(maxWidth: 160)
+                Spacer()
             }
         }
-        .padding()
+    }
+}
+
+/// Shared section header used across settings panels.
+struct SettingsSectionHeader: View {
+    let title: String
+    let subtitle: String?
+
+    init(_ title: String, subtitle: String? = nil) {
+        self.title = title
+        self.subtitle = subtitle
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(title)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.text)
+            if let subtitle {
+                Text(subtitle)
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 
@@ -173,26 +232,45 @@ struct AISearchSettingsView: View {
     @State private var apiKey = ""
 
     var body: some View {
-        Form {
-            SecureField("OpenRouter API Key:", text: $apiKey)
-                .onAppear { apiKey = KeychainService.load() ?? "" }
-                .onChange(of: apiKey) { _, newValue in
-                    if newValue.isEmpty { KeychainService.delete() }
-                    else { try? KeychainService.save(key: newValue) }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                SettingsSectionHeader("OpenRouter",
+                                      subtitle: "AI Search routes prompts via OpenRouter. Only conversation titles and first messages are sent — full conversation content is never transmitted.")
+                HStack(spacing: 8) {
+                    Text("API key:")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                    SecureField("sk-or-…", text: $apiKey)
+                        .textFieldStyle(.roundedBorder)
+                        .onAppear { apiKey = KeychainService.load() ?? "" }
+                        .onChange(of: apiKey) { _, newValue in
+                            if newValue.isEmpty { KeychainService.delete() }
+                            else { try? KeychainService.save(key: newValue) }
+                        }
+                    Spacer()
                 }
-
-            Picker("Model:", selection: $model) {
-                Text("Claude Sonnet 4").tag("anthropic/claude-sonnet-4")
-                Text("Claude Haiku 4.5").tag("anthropic/claude-haiku-4-5")
-                Text("Gemini 2.5 Flash").tag("google/gemini-2.5-flash")
-                Text("GPT-4o Mini").tag("openai/gpt-4o-mini")
+                Divider()
+                HStack(spacing: 8) {
+                    Text("Model:")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                    Picker("", selection: $model) {
+                        Text("Claude Sonnet 4").tag("anthropic/claude-sonnet-4")
+                        Text("Claude Haiku 4.5").tag("anthropic/claude-haiku-4-5")
+                        Text("Gemini 2.5 Flash").tag("google/gemini-2.5-flash")
+                        Text("GPT-4o Mini").tag("openai/gpt-4o-mini")
+                    }
+                    .labelsHidden()
+                    .frame(maxWidth: 220)
+                    Spacer()
+                }
+                Text("Stored in your macOS Keychain — never written to disk in plaintext.")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.textTertiary)
             }
-
-            Text("AI Search sends conversation titles and first messages to OpenRouter. Full conversation content is never sent.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
     }
 }
 
@@ -201,10 +279,28 @@ struct AdvancedSettingsView: View {
     @AppStorage("backupDir") private var backupDir = "~/.claude-sessions-backups"
 
     var body: some View {
-        Form {
-            TextField("Claude CLI Path:", text: $cliPath)
-            TextField("Backup Directory:", text: $backupDir)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                SettingsSectionHeader("Paths",
+                                      subtitle: "Power-user overrides. The defaults are correct for nearly everyone.")
+                pathRow(label: "Claude CLI:", binding: $cliPath, placeholder: "/usr/local/bin/claude")
+                pathRow(label: "Backup directory:", binding: $backupDir, placeholder: "~/.claude-sessions-backups")
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
+    }
+
+    @ViewBuilder
+    private func pathRow(label: String, binding: Binding<String>, placeholder: String) -> some View {
+        HStack(alignment: .center, spacing: 8) {
+            Text(label)
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.textSecondary)
+                .frame(width: 110, alignment: .trailing)
+            TextField(placeholder, text: binding)
+                .textFieldStyle(.roundedBorder)
+                .font(.system(size: 11, design: .monospaced))
+        }
     }
 }

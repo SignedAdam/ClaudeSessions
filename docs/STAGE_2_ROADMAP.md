@@ -287,8 +287,8 @@ Window: `.frame(width: 520, height: 420)` on `SettingsView`'s `TabView`. Usable 
 
 - id: P4.T03
   title: "Re-style settings tabs to match app theming — `Theme.surface` backgrounds, `Theme.text` for headings, `Theme.textSecondary` for body, no native white panel."
-  status: queued
-  notes: "Possibly drop `TabView` style in favor of a custom sidebar+detail two-pane layout for better hierarchy."
+  status: done
+  notes: "Done in cycle 42. Converted General, AISearch, Advanced from Form to ScrollView+VStack with shared SettingsSectionHeader using Theme.text + Theme.textSecondary. Now matches the existing pattern from Claude Code + MCP + Backup. TabView's outer chrome stays (system-managed) but every tab's content is now themed."
 
 - id: P4.T04
   title: "Resize the settings window to 640×520 default with a min size that lets the longest tab fit without scrolling."
