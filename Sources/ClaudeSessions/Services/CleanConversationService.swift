@@ -39,7 +39,8 @@ struct CleanConversationService {
         conversation: Conversation,
         editedTexts: [String: String] = [:],
         deletedMessageIds: Set<String> = [],
-        displayName: String = "You"
+        displayName: String = "You",
+        stripRuntimeNoise: Bool = true
     ) -> CleanResult {
         let newSessionId = UUID().uuidString.lowercased()
         var jsonlLines: [String] = []
@@ -69,7 +70,8 @@ struct CleanConversationService {
                     parentUuid: lastKeptUuid,
                     displayMessages: displayByEntryIndex[indexed.index] ?? [],
                     editedTexts: editedTexts,
-                    deletedMessageIds: deletedMessageIds
+                    deletedMessageIds: deletedMessageIds,
+                    stripRuntimeNoise: stripRuntimeNoise
                 ) else { continue }
 
                 if let json = serializeJSON(cleaned.dict) {
@@ -132,7 +134,8 @@ struct CleanConversationService {
         parentUuid: String?,
         displayMessages: [DisplayMessage],
         editedTexts: [String: String],
-        deletedMessageIds: Set<String>
+        deletedMessageIds: Set<String>,
+        stripRuntimeNoise: Bool
     ) -> ProcessedEntry? {
         // Must have message with string content (text message, not tool_result)
         guard let msg = dict["message"] as? [String: Any],
@@ -161,6 +164,13 @@ struct CleanConversationService {
         var finalContent = content
         if let did = displayId, let edited = editedTexts[did] {
             finalContent = edited
+        }
+
+        // Strip Claude Code's runtime-noise wrappers if enabled. See
+        // cycle 45 findings — these wrappers carry no user intent and
+        // muddy a cleaned dialogue extract.
+        if stripRuntimeNoise {
+            finalContent = Self.stripNoiseWrappers(from: finalContent)
         }
 
         // Skip empty messages
@@ -290,5 +300,37 @@ struct CleanConversationService {
             return nil
         }
         return String(data: data, encoding: .utf8)
+    }
+
+    // MARK: - Runtime-noise wrapper stripping
+
+    /// Tags Claude Code injects into user-text bodies that aren't part of
+    /// the user's intent. Stripped from cleaned dialogue when
+    /// `stripRuntimeNoise` is true.
+    private static let noiseTags = [
+        "system-reminder",
+        "local-command-caveat",
+        "command-stdout",
+        "command-stderr"
+    ]
+
+    /// Remove `<tag>...</tag>` blocks for any well-known noise tag.
+    /// Multiline-aware. Whitespace cleaned up at the join.
+    static func stripNoiseWrappers(from text: String) -> String {
+        var out = text
+        for tag in noiseTags {
+            // (?s) = dotall, so .* spans newlines.
+            let pattern = "(?s)<\(tag)\\b[^>]*>.*?</\(tag)>"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: []) {
+                let range = NSRange(out.startIndex..<out.endIndex, in: out)
+                out = regex.stringByReplacingMatches(in: out, options: [], range: range, withTemplate: "")
+            }
+        }
+        // Collapse runs of blank lines that the strip can leave behind.
+        if let collapse = try? NSRegularExpression(pattern: "\n{3,}", options: []) {
+            let range = NSRange(out.startIndex..<out.endIndex, in: out)
+            out = collapse.stringByReplacingMatches(in: out, options: [], range: range, withTemplate: "\n\n")
+        }
+        return out.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

@@ -352,9 +352,9 @@ What we CAN preserve / strip selectively in the dialogue extract:
 The original "preserve initial context" toggle isn't useful as designed since there's nothing to preserve. T03's setting will be the actual user-facing control.
 
 - id: P5.T02
-  title: "`CleanConversationService` option: `preserveInitialContext: Bool` — when true, keep the first user entry's injected blocks intact; when false (current behavior), strip them. Default true."
-  status: queued
-  notes: ""
+  title: "`CleanConversationService` option: `stripRuntimeNoise: Bool` (renamed from preserveInitialContext per T01 findings) — strip <system-reminder> and <local-command-caveat> wrappers from user text in the cleaned dialogue. Default true."
+  status: done
+  notes: "Done in cycle 46. New stripRuntimeNoise parameter on clean() (default true). Static stripNoiseWrappers() helper uses NSRegularExpression with (?s) dotall flag to remove <system-reminder>, <local-command-caveat>, <command-stdout>, <command-stderr> tags. Collapses 3+ blank lines to 2 and trims edges. Callers untouched (use default)."
 
 - id: P5.T03
   title: "Setting: 'Preserve initial Claude Code context' toggle in Settings → Extract."
