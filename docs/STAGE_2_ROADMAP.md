@@ -453,8 +453,8 @@ Confirmed live on this machine: 2 sessions in saves backups, BackupEngine mirror
 
 - id: P7.T02
   title: "VersionHistoryService — given a sessionId, return a chronologically-sorted [Version] with {timestamp, source kind, filePath, size, messageCount?, isCurrent}. Filesystem-based; no manifest dependency."
-  status: queued
-  notes: "Source kinds: .live (current source file), .saveBackup, .vaultSnapshot, .vaultLive, .archive. Reuse BackupVaultService where possible."
+  status: done
+  notes: "Done in cycle 55. New Services/VersionHistoryService.swift with SourceKind enum (live/saveBackup/vaultLive/vaultSnapshot/archive) and Version struct. Single static `versions(forSessionId:projectSlug:)` returns sorted [Version]. Each source has its own helper. Reuses BackupEngine.backupMirrorRoot for vault paths, ArchiveService.listArchived for archive entries. Pure filesystem walks, no manifest dependency."
 
 - id: P7.T03
   title: "Versions sheet UI — modal sheet listing all versions for one session. Each row: timestamp, source kind chip, size, message count. Multi-select up to 2 rows for diff. Single-select shows preview pane."

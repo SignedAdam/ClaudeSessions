@@ -122,7 +122,7 @@ enum MCPLaunchTools {
                     throw MCPToolError.unavailable("could not resolve project cwd for session \(id)")
                 }
 
-                ProcessLauncher.resumeSession(sessionId: id, cwd: cwd, displayName: info.title)
+                ProcessLauncher.resumeSession(sessionId: id, cwd: cwd)
                 return [
                     "id": id,
                     "cwd": cwd,
