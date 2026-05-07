@@ -588,8 +588,8 @@ session — today they hide unless you expand the parent.
 
 - id: P10.T03
   title: "Settings panel — 'Scan locations'. List the default root (non-removable, marked as such) plus any custom roots. Add button → NSOpenPanel folder picker. Remove buttons next to each custom row. Live count of projects/sessions per root."
-  status: queued
-  notes: "Lives in Views/Settings/. Add a SettingsTab case. Uses BackupSettingsView's row layout style. Per-root counts can come from a quick scan or be lazy."
+  status: done
+  notes: "Done in cycle 73. New file Views/Settings/ScanLocationsSettingsView.swift with one tile per root: house icon + 'default' pill for the default, folder icon + minus.circle remove button for custom roots. Each tile shows lastPathComponent (bold), full path (monospaced truncated middle), and a project-folder count (top-level dir count, .-prefixed skipped). 'Add location…' button opens NSOpenPanel (canChooseDirectories=true). On reject, ScanRootStore's reason string renders inline in red. Tab inserted in SettingsView between Backup and Claude Code as 'Locations' (folder.badge.plus). Footer note clarifies that adding a location only changes what the app reads — backup mirror still watches the default root only."
 
 - id: P10.T04
   title: "ProjectScanner multi-root — accept a list of roots (default + custom). Scan each independently. Tag every Project with its source root URL so we can disambiguate same-named slugs across roots. Sidebar: when more than one root is configured, show the root nickname (last path component) as a small tag on each project."

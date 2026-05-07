@@ -14,6 +14,9 @@ struct SettingsView: View {
             BackupSettingsView()
                 .tabItem { Label("Backup", systemImage: "externaldrive.badge.timemachine") }
 
+            ScanLocationsSettingsView()
+                .tabItem { Label("Locations", systemImage: "folder.badge.plus") }
+
             ClaudeCodeSettingsView()
                 .tabItem { Label("Claude Code", systemImage: "gearshape.2") }
 
