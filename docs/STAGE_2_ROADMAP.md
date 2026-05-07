@@ -313,8 +313,43 @@ priming. Make this user-configurable.
 
 - id: P5.T01
   title: "Survey what Claude Code injects into the first user message — read the message bodies of the first user entry across several sessions on disk; classify the chunks (CLAUDE.md, system reminders, git status, tools list, etc.)."
-  status: queued
-  notes: "Output: a short note here describing the structure so we can selectively strip."
+  status: done
+  notes: "Done in cycle 45. See findings below."
+
+#### Findings (cycle 45 — first-user-message survey)
+
+Surveyed ~40 random sessions across `~/.claude/projects/`. **The first user message is almost always JUST the user's prompt** — no CLAUDE.md, no git status, no tools list. Those things are in the **system prompt**, not the user message (consistent with cycle 21 docs research).
+
+Across all sampled sessions, none had `<system-reminder>` or CLAUDE.md content embedded in the first user message body.
+
+**What CAN appear in the first user entry:**
+
+1. **Plain user prompt text** — most common case. No injection.
+2. **`<command-message>` / `<command-name>` / `<command-args>`** — when the user's first action is a slash command (`/loop`, `/clear`, etc.). This IS user intent and should be preserved.
+3. **`<local-command-caveat>`** — boilerplate injected when the session starts via a local command. Looks like noise; should be strippable.
+4. **Tool-result blocks** (when content is a list, not a string) — these are NEVER the first message of a fresh session, only subsequent ones. Already classified as a tool-result display message by our parser, not user-text.
+
+**Implication for T02–T04 (configurable preserve-initial-context):**
+
+The original framing ("first user message contains injected context worth preserving") doesn't quite match the data. The injected context is in the system prompt, which never makes it into the JSONL — so we can't preserve it.
+
+What we CAN preserve / strip selectively in the dialogue extract:
+
+| Wrapper | Today (CleanConversationService) | What it actually means | Recommendation |
+|---|---|---|---|
+| Plain user text | preserved | The user's actual prompt | always preserve |
+| `<command-message>` block | preserved (passes the userText filter) | User's slash command intent | preserve by default; option to strip |
+| `<local-command-caveat>` | preserved (passes the userText filter) | Claude Code system noise | option to strip; **default true** |
+| `<system-reminder>` mid-prompt | preserved | Most are runtime nudges; some are user-relevant | option to strip; default true |
+| Tool-result blocks | stripped (not userText) | Already excluded — correct | n/a |
+
+**Revised T02–T04 plan:**
+
+- T02: extend `CleanConversationService` with `stripUserMessageWrappers: Bool` (default true). When true, regex-strip well-known wrappers (`<system-reminder>...</system-reminder>`, `<local-command-caveat>...</local-command-caveat>`) from user-text bodies before they're emitted. Keep `<command-message>` blocks since those carry user intent.
+- T03: settings toggle "Strip Claude Code's runtime noise from extracted dialogue" (default on).
+- T04 (selective strip): allow per-wrapper toggling. Stretch — likely deferred unless someone hits the corner case.
+
+The original "preserve initial context" toggle isn't useful as designed since there's nothing to preserve. T03's setting will be the actual user-facing control.
 
 - id: P5.T02
   title: "`CleanConversationService` option: `preserveInitialContext: Bool` — when true, keep the first user entry's injected blocks intact; when false (current behavior), strip them. Default true."
