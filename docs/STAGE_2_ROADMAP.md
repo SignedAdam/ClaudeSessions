@@ -357,14 +357,14 @@ The original "preserve initial context" toggle isn't useful as designed since th
   notes: "Done in cycle 46. New stripRuntimeNoise parameter on clean() (default true). Static stripNoiseWrappers() helper uses NSRegularExpression with (?s) dotall flag to remove <system-reminder>, <local-command-caveat>, <command-stdout>, <command-stderr> tags. Collapses 3+ blank lines to 2 and trims edges. Callers untouched (use default)."
 
 - id: P5.T03
-  title: "Setting: 'Preserve initial Claude Code context' toggle in Settings → Extract."
-  status: queued
-  notes: "Default on. Help text explains what it does."
+  title: "Setting: 'Preserve initial Claude Code context' toggle in Settings → Extract. (Reframed per T01: 'Strip Claude Code's runtime noise from extracted dialogue'.)"
+  status: done
+  notes: "Done in cycle 47. New @AppStorage('extractStripRuntimeNoise') Bool=true. ExtractSettingsView added a 'Cleanup' section with the toggle. AppState.extractStripRuntimeNoise threaded into all 3 cleaner.clean() call sites."
 
 - id: P5.T04
   title: "Selective strip — within the initial context, allow toggling each chunk type (CLAUDE.md, git, tools list)."
-  status: queued
-  notes: "Stretch. Worth doing once T01 reveals what's actually there."
+  status: skipped
+  notes: "Skipped per T01 findings — there's no per-chunk granularity to expose because the noise wrappers are all functionally similar (system-injected, not user intent). Single on/off toggle in T03 is sufficient. **Phase 5 effectively complete.**"
 
 ---
 

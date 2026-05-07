@@ -145,6 +145,7 @@ struct SettingsSectionHeader: View {
 
 struct ExtractSettingsView: View {
     @AppStorage("extractMode") private var extractModeRaw: String = ExtractMode.newSession.rawValue
+    @AppStorage("extractStripRuntimeNoise") private var stripRuntimeNoise: Bool = true
 
     var body: some View {
         ScrollView {
@@ -177,6 +178,26 @@ struct ExtractSettingsView: View {
                 Text("You can override per-click by right-clicking the Extract button.")
                     .font(.system(size: 10))
                     .foregroundStyle(Theme.textTertiary)
+
+                Divider()
+
+                SettingsSectionHeader(
+                    "Cleanup",
+                    subtitle: "Tune what gets stripped beyond the obvious tool calls and system events."
+                )
+
+                Toggle(isOn: $stripRuntimeNoise) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Strip Claude Code runtime-noise wrappers")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.text)
+                        Text("Removes <system-reminder>, <local-command-caveat>, and command-stdout/stderr blocks from the cleaned dialogue. Default on. Turn off if you want to see exactly what was injected during the original session.")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Theme.textTertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .toggleStyle(.switch)
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -48,6 +48,7 @@ final class AppState: ObservableObject {
     @AppStorage("displayName") var displayName = "You"
     @AppStorage("theme") var theme = "system"
     @AppStorage("extractMode") var extractModeRaw: String = ExtractMode.newSession.rawValue
+    @AppStorage("extractStripRuntimeNoise") var extractStripRuntimeNoise: Bool = true
 
     /// Per-target export usage. Encoded as JSON in @AppStorage so we can
     /// promote whichever agent the user picks most often into the primary
@@ -546,7 +547,8 @@ final class AppState: ObservableObject {
             conversation: conv,
             editedTexts: editedTexts,
             deletedMessageIds: deletedMessageIds,
-            displayName: displayName
+            displayName: displayName,
+            stripRuntimeNoise: extractStripRuntimeNoise
         )
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(result.plainText, forType: .string)
@@ -619,7 +621,8 @@ final class AppState: ObservableObject {
             conversation: conv,
             editedTexts: editedTexts,
             deletedMessageIds: deletedMessageIds,
-            displayName: displayName
+            displayName: displayName,
+            stripRuntimeNoise: extractStripRuntimeNoise
         )
 
         if result.jsonl.isEmpty {
@@ -663,7 +666,8 @@ final class AppState: ObservableObject {
             conversation: conv,
             editedTexts: editedTexts,
             deletedMessageIds: deletedMessageIds,
-            displayName: displayName
+            displayName: displayName,
+            stripRuntimeNoise: extractStripRuntimeNoise
         )
         if result.plainText.isEmpty {
             showToast("No conversation text to extract")
