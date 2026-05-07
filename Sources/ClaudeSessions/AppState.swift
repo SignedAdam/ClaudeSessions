@@ -129,6 +129,18 @@ final class AppState: ObservableObject {
         if continuousBackupEnabled {
             backupEngine.start()
         }
+        // Register MCP tools after init so closures can capture self.
+        // The server itself is started lazily by the Settings toggle (P3.T07).
+        DispatchQueue.main.async { [weak self] in
+            self?.bootstrapMCPTools()
+        }
+    }
+
+    private var didBootstrapMCP = false
+    private func bootstrapMCPTools() {
+        guard !didBootstrapMCP else { return }
+        didBootstrapMCP = true
+        MCPNavigationTools.register(server: mcpServer, appState: self)
     }
 
     /// Toggle the continuous-backup engine. Persists the preference too.

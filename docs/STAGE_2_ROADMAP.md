@@ -221,8 +221,8 @@ with my prompt 'continue from here'" — and Claude does it via our app.
 
 - id: P3.T03
   title: "Tools: navigation — `list_projects`, `list_sessions(project_id)`, `open_session(session_id)`, `close_session()`."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 35. New file Services/MCPTools/MCPNavigationTools.swift with 4 tools. All bounce to @MainActor before touching AppState. Registered via bootstrapMCPTools() called from init-deferred main.async. MCPToolError enum (badArgument/notFound/unavailable) defined for future tool cycles to share."
 
 - id: P3.T04
   title: "Tools: read — `read_dialogue_only(session_id)`, `read_full_transcript(session_id)`, `read_session_metadata(session_id)`."
