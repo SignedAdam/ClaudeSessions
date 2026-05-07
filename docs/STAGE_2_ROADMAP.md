@@ -226,8 +226,8 @@ with my prompt 'continue from here'" — and Claude does it via our app.
 
 - id: P3.T04
   title: "Tools: read — `read_dialogue_only(session_id)`, `read_full_transcript(session_id)`, `read_session_metadata(session_id)`."
-  status: queued
-  notes: "Returns plain-text or structured data depending on the call."
+  status: done
+  notes: "Done in cycle 36. MCPReadTools.swift — three tools that reuse ConversationParser + ClipboardService.formatFullTranscript. Heavy reads parse JSONL off-main via Task.detached. 25MB ceiling matches AppState's in-app loader. Registered alongside navigation tools."
 
 - id: P3.T05
   title: "Tools: organize — `star`, `unstar`, `hide`, `unhide`, `archive`, `unarchive`, `move_to_project`, `delete_to_trash`."
