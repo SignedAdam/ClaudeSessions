@@ -583,8 +583,8 @@ session — today they hide unless you expand the parent.
 
 - id: P10.T02
   title: "ScanRootStore — UserDefaults-backed singleton holding the extra scan-root URLs (default `~/.claude/projects/` is implicit and always included). API: roots(), addRoot(URL), removeRoot(URL), persisted across launches."
-  status: queued
-  notes: "Mirror the FavoritesStore pattern (singleton + @Published + UserDefaults). Validate on add: directory exists, is a directory, is readable. De-dupe paths (resolve symlinks via .resolvingSymlinksInPath). Don't allow adding the default root as a custom one."
+  status: done
+  notes: "Done in cycle 72. Sources/ClaudeSessions/Services/ScanRootStore.swift mirrors FavoritesStore exactly (singleton, @MainActor, JSON persistence at ~/.claude-sessions-app/scan-roots.json). Public surface: allRoots() returns [defaultRoot] + customRoots; addRoot(URL) -> String? returns nil on success or human-readable rejection (not-a-dir / unreadable / duplicate / is-default); removeRoot(URL); static rootKey(for:) gives a stable canonical key (resolved+standardized path → base-36 hash) for ForEach disambiguation; static defaultRoot URL. Wired as @StateObject in ClaudeSessionsApp and propagated via .environmentObject for both WindowGroup and Settings scenes."
 
 - id: P10.T03
   title: "Settings panel — 'Scan locations'. List the default root (non-removable, marked as such) plus any custom roots. Add button → NSOpenPanel folder picker. Remove buttons next to each custom row. Live count of projects/sessions per root."

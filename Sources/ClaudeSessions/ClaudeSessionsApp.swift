@@ -25,6 +25,7 @@ struct ClaudeSessionsApp: App {
     @StateObject private var themeStore = ThemeStore.shared
     @StateObject private var hiddenStore = HiddenStore.shared
     @StateObject private var favoritesStore = FavoritesStore.shared
+    @StateObject private var scanRootStore = ScanRootStore.shared
 
     var body: some Scene {
         WindowGroup {
@@ -33,6 +34,7 @@ struct ClaudeSessionsApp: App {
                 .environmentObject(themeStore)
                 .environmentObject(hiddenStore)
                 .environmentObject(favoritesStore)
+                .environmentObject(scanRootStore)
                 .frame(minWidth: 900, minHeight: 560)
                 .preferredColorScheme(.dark)
                 .background(WindowAccessor { window in
@@ -72,6 +74,7 @@ struct ClaudeSessionsApp: App {
                 .environmentObject(themeStore)
                 .environmentObject(hiddenStore)
                 .environmentObject(favoritesStore)
+                .environmentObject(scanRootStore)
         }
     }
 
