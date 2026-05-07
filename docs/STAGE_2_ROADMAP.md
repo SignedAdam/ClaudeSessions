@@ -156,8 +156,8 @@ Tested live against a real session in this project. Findings:
 
 - id: P2.T05
   title: "Cancel run — a Stop button while the subprocess is alive. Sends SIGINT, then SIGTERM if it doesn't quit."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 31. ComposerView's send button branches on isComposerSending — shows submit on idle, stop on in-flight (red stop.fill inside a spinner ring). Click → ClaudeRunner.cancel() (SIGINT, then SIGTERM after 1s grace, already plumbed in T03). ⌘. shortcut also bound."
 
 - id: P2.T06
   title: "Setting: enable/disable embedded chat — for users who prefer to keep all interactive work in their terminal."

@@ -72,24 +72,52 @@ struct ComposerView: View {
         )
     }
 
+    @ViewBuilder
     private var sendButton: some View {
+        if appState.isComposerSending {
+            stopButton
+        } else {
+            submitButton
+        }
+    }
+
+    private var submitButton: some View {
         Button {
             appState.submitComposer()
         } label: {
-            ZStack {
-                if appState.isComposerSending {
-                    ProgressView().controlSize(.small)
-                } else {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 22))
-                        .foregroundStyle(canSubmit ? Theme.accent : Theme.textTertiary)
-                }
-            }
-            .frame(width: 32, height: 32)
+            Image(systemName: "arrow.up.circle.fill")
+                .font(.system(size: 22))
+                .foregroundStyle(canSubmit ? Theme.accent : Theme.textTertiary)
+                .frame(width: 32, height: 32)
         }
         .buttonStyle(.plain)
         .disabled(!canSubmit)
         .help(canSubmit ? "Send (⌘↩)" : "Type something to send")
+    }
+
+    /// Shown while a `claude -p` run is in-flight. Clicking sends SIGINT
+    /// (then SIGTERM after a 1s grace) via `ClaudeRunner.cancel()`.
+    /// A spinner ring around the stop glyph signals "still running."
+    private var stopButton: some View {
+        Button {
+            appState.cancelComposer()
+        } label: {
+            ZStack {
+                Circle()
+                    .stroke(Theme.textTertiary.opacity(0.4), lineWidth: 1.5)
+                    .frame(width: 22, height: 22)
+                ProgressView()
+                    .controlSize(.small)
+                    .opacity(0.55)
+                Image(systemName: "stop.fill")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(Theme.errorTint)
+            }
+            .frame(width: 32, height: 32)
+        }
+        .buttonStyle(.plain)
+        .help("Stop · sends SIGINT to claude")
+        .keyboardShortcut(".", modifiers: .command)
     }
 
     // MARK: - Logic
