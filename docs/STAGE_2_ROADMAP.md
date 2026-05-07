@@ -231,8 +231,8 @@ with my prompt 'continue from here'" — and Claude does it via our app.
 
 - id: P3.T05
   title: "Tools: organize — `star`, `unstar`, `hide`, `unhide`, `archive`, `unarchive`, `move_to_project`, `delete_to_trash`."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 37. MCPOrganizeTools.swift — 8 tools, all thin wrappers around FavoritesStore.shared / HiddenStore.shared / appState.archiveSession / appState.restoreArchivedSession / appState.copySessionToProject / appState.confirmDeleteSession. delete_to_trash uses macOS Trash so it's recoverable; doc warns clients to confirm with the user."
 
 - id: P3.T06
   title: "Tools: launch — `extract_and_open(session_id, mode)`, `resume_in_terminal(session_id)`."
