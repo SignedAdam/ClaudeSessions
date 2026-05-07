@@ -492,13 +492,13 @@ This phase puts the UI on top of the existing scaffolding.
 
 - id: P8.T01
   title: "Audit existing select-mode infrastructure — confirm AppState properties, ClipboardService.copyMessages, and any in-flight references. Document the API gaps to fill."
-  status: queued
-  notes: "Quick research. Output: short note in this roadmap with the surface area that exists vs what needs adding."
+  status: done
+  notes: "Done in cycle 61. Inventory: AppState has isSelectMode + selectedMessageIds (cycle 09 era stubs). ClipboardService has static copyMessages([DisplayMessage]). No view file references either. Gaps: AppState lacks toggleSelection / selectAllVisible / enter/exitSelectMode / copySelection. UserMessageView + AssistantMessageView need a leading checkbox in select mode. ConversationView needs a SelectModeBar at the top. ConversationToolbar needs an entry point."
 
 - id: P8.T02
   title: "AppState helpers — toggleSelection(messageId:), selectAllVisible(), enterSelectMode(), exitSelectMode(). Wire copyMessages so it pulls from selectedMessageIds + currentConversation.displayMessages."
-  status: queued
-  notes: "Pure state methods, no UI. Each ≤10 lines."
+  status: done
+  notes: "Done in cycle 61. Five helpers added on AppState: enterSelectMode, exitSelectMode, toggleSelection, selectAllVisible (respects current filter pills + reading mode), copySelection (calls ClipboardService.copyMessages + toast). All ≤15 lines each."
 
 - id: P8.T03
   title: "Message row checkbox — render a small left-edge checkbox in user/assistant message views when isSelectMode, taps toggle via AppState. Hover/edit overlays should disable while selecting (or simply not interfere)."

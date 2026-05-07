@@ -1080,6 +1080,60 @@ final class AppState: ObservableObject {
         claudeRunner.cancel()
     }
 
+    // MARK: - Multi-select copy mode (Phase 8)
+
+    /// Enter select mode and clear any prior selection.
+    func enterSelectMode() {
+        isSelectMode = true
+        selectedMessageIds = []
+    }
+
+    /// Leave select mode and clear the selection. Idempotent.
+    func exitSelectMode() {
+        isSelectMode = false
+        selectedMessageIds = []
+    }
+
+    /// Toggle a single message's membership in the selection.
+    func toggleSelection(messageId: String) {
+        if selectedMessageIds.contains(messageId) {
+            selectedMessageIds.remove(messageId)
+        } else {
+            selectedMessageIds.insert(messageId)
+        }
+    }
+
+    /// Replace selection with every message currently visible in the
+    /// conversation (subject to the user's filter pills + reading-mode
+    /// rules — same set the conversation view actually renders).
+    func selectAllVisible() {
+        guard let conv = currentConversation else { return }
+        let visible = conv.displayMessages.filter { msg in
+            if isReadingMode {
+                switch msg {
+                case .userText(let m): return !m.isCompactSummary
+                case .assistantText(let m): return !m.isApiError
+                default: return false
+                }
+            }
+            return msg.isVisible(
+                showUser: showUserMessages,
+                showAssistant: showAssistantMessages,
+                showTool: showToolMessages,
+                showSystem: showSystemMessages
+            )
+        }
+        selectedMessageIds = Set(visible.map(\.id))
+    }
+
+    /// Copy selected messages as a formatted transcript. No-op if empty.
+    func copySelection() {
+        guard let conv = currentConversation, !selectedMessageIds.isEmpty else { return }
+        let chosen = conv.displayMessages.filter { selectedMessageIds.contains($0.id) }
+        ClipboardService.copyMessages(chosen, displayName: displayName, editedTexts: editedTexts)
+        showToast("Copied \(chosen.count) message\(chosen.count == 1 ? "" : "s")")
+    }
+
     func showToast(_ message: String) {
         toastMessage = message
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
