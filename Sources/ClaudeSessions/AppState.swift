@@ -69,6 +69,11 @@ final class AppState: ObservableObject {
     // Context detail sheet
     @Published var showContextSheet = false
 
+    // Embedded chat composer (Phase 2)
+    @Published var composerText: String = ""
+    @Published var isComposerSending: Bool = false
+    @AppStorage("embeddedChatEnabled") var embeddedChatEnabled: Bool = true
+
     /// Cached metrics for the currently open conversation. Recomputed on
     /// `selectSession` so it stays in sync.
     @Published private(set) var contextMetrics: ContextMetrics.Result?
@@ -891,6 +896,29 @@ final class AppState: ObservableObject {
         f.dateFormat = "MMM d HH:mm"
         let ts = f.string(from: Date())
         return "\(sourceTitle) · clean · \(ts)"
+    }
+
+    /// Send the composer's current text into the open conversation via
+    /// `claude -p --resume`. Stub for now — the real subprocess plumbing
+    /// lands in P2.T03 (`ClaudeRunner`). Today this just acknowledges and
+    /// clears the text so the UI can be exercised.
+    func submitComposer() {
+        let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        guard !isComposerSending else { return }
+        guard currentConversation != nil else {
+            showToast("Open a conversation first")
+            return
+        }
+        // Lock the composer so the user sees in-flight state. The stub
+        // releases it after a short delay; the real ClaudeRunner will
+        // release it when the subprocess exits.
+        isComposerSending = true
+        composerText = ""
+        showToast("Submit not wired yet — landing in P2.T03 (ClaudeRunner).")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.isComposerSending = false
+        }
     }
 
     func showToast(_ message: String) {

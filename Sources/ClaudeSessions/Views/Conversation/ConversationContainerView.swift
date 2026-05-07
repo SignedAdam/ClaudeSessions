@@ -18,6 +18,9 @@ struct ConversationContainerView: View {
                         // iMessage mode takes over the background too — authentic
                         // iOS Messages backdrop, not the active palette.
                         .background(conversationBackground)
+                    if appState.embeddedChatEnabled {
+                        ComposerView()
+                    }
                 }
             }
 

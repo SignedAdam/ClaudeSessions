@@ -141,8 +141,8 @@ Tested live against a real session in this project. Findings:
 
 - id: P2.T02
   title: "Compose box at the bottom of `ConversationView` — multi-line TextEditor, Send button, ⌘↩ submit, disabled while a previous message is in-flight."
-  status: queued
-  notes: "Visible only in Chat/Reading mode, not JSON. Hidden when no session is open."
+  status: done
+  notes: "Done in cycle 28. New `ComposerView.swift` — multi-line TextEditor (32–140pt), Send button with arrow-up.circle.fill icon, ⌘↩ keyboard shortcut, in-flight spinner. Hidden in JSON mode and toggleable via `embeddedChatEnabled` (@AppStorage, default true). `submitComposer()` on AppState is currently a stub showing a toast — real subprocess plumbing is P2.T03."
 
 - id: P2.T03
   title: "Subprocess plumbing — `ClaudeRunner` service that spawns `claude -p`, streams stdout/stderr, surfaces errors as toasts, captures the run's exit status."
