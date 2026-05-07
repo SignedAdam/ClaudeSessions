@@ -26,7 +26,8 @@ struct SettingsView: View {
             AdvancedSettingsView()
                 .tabItem { Label("Advanced", systemImage: "wrench") }
         }
-        .frame(width: 520, height: 420)
+        .frame(minWidth: 520, idealWidth: 640, maxWidth: 900,
+               minHeight: 420, idealHeight: 520, maxHeight: 900)
     }
 }
 

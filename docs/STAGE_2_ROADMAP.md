@@ -292,8 +292,8 @@ Window: `.frame(width: 520, height: 420)` on `SettingsView`'s `TabView`. Usable 
 
 - id: P4.T04
   title: "Resize the settings window to 640×520 default with a min size that lets the longest tab fit without scrolling."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 43. SettingsView frame: minWidth 520 / idealWidth 640 / maxWidth 900, minHeight 420 / idealHeight 520 / maxHeight 900. Default 640×520 lets the longer tabs (Backup, Claude Code, MCP) fit comfortably. The min keeps the previous size as a floor; the max prevents stretching to absurd dimensions. ScrollView from T02 covers the < idealHeight case."
 
 - id: P4.T05
   title: "Section dividers + spacing pass on every tab — currently inconsistent."
