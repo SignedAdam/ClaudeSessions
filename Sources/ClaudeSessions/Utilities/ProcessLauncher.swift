@@ -105,7 +105,7 @@ enum ProcessLauncher {
             try FileManager.default.setAttributes([.posixPermissions: 0o755],
                                                   ofItemAtPath: scriptURL.path)
         } catch {
-            print("ProcessLauncher: failed to write .command script: \(error)")
+            NSLog("[ClaudeSessions] launcher: failed to write .command script: \(error)")
             return
         }
 

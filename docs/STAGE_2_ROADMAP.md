@@ -393,8 +393,8 @@ half-finished while shipping fast.
 
 - id: P6.T04
   title: "Strip leftover debug `print` statements (e.g. the `[Forker]` continueFrom logs) once truncation is confirmed working."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 51. [Forker] prints were already gone. Removed two timing prints from AppState.performLoad (read/parse durations) and the cancellation print (cancellation is expected, no need to log). Real error paths kept and routed through NSLog so they appear in Console.app instead of dev-only stdout. ProcessLauncher's script-write error also moved to NSLog."
 
 - id: P6.T05
   title: "Polish list at the bottom of `ROADMAP.md` — execute as many of those nits as fit in one cycle."

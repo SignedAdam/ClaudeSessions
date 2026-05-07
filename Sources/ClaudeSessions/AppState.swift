@@ -273,28 +273,23 @@ final class AppState: ObservableObject {
             do {
                 try Task.checkCancellation()
 
-                let t0 = Date()
-                let size = (try? FileManager.default.attributesOfItem(atPath: filePath)[.size] as? Int) ?? -1
                 let data = try Data(contentsOf: URL(fileURLWithPath: filePath))
-                let tRead = Date().timeIntervalSince(t0) * 1000
-                print("[ClaudeSessions] read \(sessionId.prefix(8)) — \(size) bytes in \(Int(tRead))ms")
                 try Task.checkCancellation()
 
-                let t1 = Date()
                 let parser = ConversationParser()
                 let conv = parser.parse(data: data, sessionId: sessionId, filePath: filePath)
-                let tParse = Date().timeIntervalSince(t1) * 1000
-                print("[ClaudeSessions] parse \(sessionId.prefix(8)) — \(conv.rawEntries.count) entries, \(conv.displayMessages.count) display msgs in \(Int(tParse))ms")
                 try Task.checkCancellation()
 
                 let mod = (try? FileManager.default
                     .attributesOfItem(atPath: filePath)[.modificationDate] as? Date) ?? Date()
                 return (conv, mod)
             } catch is CancellationError {
-                print("[ClaudeSessions] load cancelled \(sessionId.prefix(8))")
+                // Expected when the user clicks another session mid-load.
                 return nil
             } catch {
-                print("[ClaudeSessions] load failed \(sessionId.prefix(8)): \(error)")
+                // Surface real load failures to Console.app so the user can
+                // diagnose without a debugger attached.
+                NSLog("[ClaudeSessions] load failed \(sessionId.prefix(8)): \(error)")
                 return nil
             }
         }.value
