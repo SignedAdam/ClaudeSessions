@@ -118,8 +118,26 @@ work still happen in the user's terminal.
 
 - id: P2.T01
   title: "Validate the `claude -p --resume <id> '<prompt>'` flow — confirm it appends to the JSONL, picks up the existing context correctly, and exits cleanly."
-  status: queued
-  notes: "Manual test against a known session. Document the exact invocation in a note here."
+  status: done
+  notes: "Validated in cycle 27. See findings below."
+
+#### Findings (cycle 27 — `claude -p --resume`)
+
+Tested live against a real session in this project. Findings:
+
+- **Exact invocation:** `cd <project-cwd> && claude -p --resume <session-id> '<prompt>'`. Working directory MUST match the original session's cwd or `--resume` won't find it.
+- **Appends to the existing JSONL** with the same sessionId. No new file is created. File grew +10 entries / ~3KB for one round-trip.
+- **Entries appended** (in order): `ai-title`, `permission-mode`, `queue-operation` (×2), `user` (the prompt), `attachment`, `assistant` (blocks: text + tool_use), `last-prompt`, `ai-title`, `permission-mode`. The user entry contains exactly our prompt text. The assistant entry has the same shape as any other assistant turn.
+- **Exit code:** 0 on success, non-zero on errors. Tested case hit "Credit balance is too low" → exit 1 + diagnostic on stderr ("Credit balance is too low"). We can surface stderr lines as toasts.
+- **Stdin behavior:** with no `< /dev/null` redirect, claude waits ~3s for stdin then prints a warning and proceeds. Our `Process` wrapper should set `task.standardInput = FileHandle.nullDevice` to skip the wait.
+- **Other useful flags found in `claude --help`:**
+  - `--no-session-persistence` — skip writing to JSONL for this turn (we don't want this).
+  - `--session-id <uuid>` — assign a specific UUID (alternative to `--resume`).
+  - `--output-format json|stream-json` — structured output. `stream-json` would let us render assistant tokens live. Worth using.
+  - `--include-partial-messages` — partial chunks for streaming.
+  - `--fork-session` — create a NEW session ID instead of resuming. Already used by SessionForker conceptually; not what we want for embedded chat.
+
+**Implication for P2.T03 (`ClaudeRunner` plumbing):** spawn `Process` with `executableURL = /usr/bin/env claude` (or absolute path), arguments `["-p", "--resume", sessionId, prompt]`, `currentDirectoryURL = cwd`, `standardInput = .nullDevice`. Pipe stdout/stderr. Watch the JSONL for the appended entries via FileWatcher (already in place). For the streaming UX in P2.T04, switch to `--output-format stream-json --include-partial-messages` and parse the live token stream alongside the JSONL tail.
 
 - id: P2.T02
   title: "Compose box at the bottom of `ConversationView` — multi-line TextEditor, Send button, ⌘↩ submit, disabled while a previous message is in-flight."
