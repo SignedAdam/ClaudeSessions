@@ -26,6 +26,7 @@ struct SelectModeBar: View {
             }
             .controlSize(.small)
             .buttonStyle(.bordered)
+            .keyboardShortcut("a", modifiers: .command)
 
             Button {
                 appState.copySelection()

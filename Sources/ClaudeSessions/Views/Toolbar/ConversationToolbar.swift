@@ -34,6 +34,12 @@ struct ConversationToolbar: View {
                 }
                 .help("Copy dialogue only · no tool calls, no system messages")
 
+                // Pick a subset of messages to copy — multi-select mode.
+                IconButton(icon: "checkmark.circle") {
+                    appState.enterSelectMode()
+                }
+                .help("Pick specific messages · enter select mode")
+
                 // Branded one-click export to another agent. Primary = the
                 // user's most-used target (Codex by default). Chevron opens
                 // a popover with all four. The full export sheet is still
@@ -175,7 +181,7 @@ struct ConversationToolbar: View {
     }
 
     private var extractLabel: String {
-        appState.extractMode == .newSession ? "clean ↗" : "clean · pipe ↗"
+        appState.extractMode == .newSession ? "supercompact ↗" : "supercompact · pipe ↗"
     }
 
     private var extractTooltip: String {

@@ -512,8 +512,8 @@ This phase puts the UI on top of the existing scaffolding.
 
 - id: P8.T05
   title: "Entry points + keyboard — 'Select…' command in the toolbar or session header, ⌘A to select-all-visible while in select mode, Esc to exit. ⌘C copies the selection."
-  status: queued
-  notes: "Where to put the entry: a small button in the conversation toolbar's quick-actions cluster reads naturally. ⌘C should only override default copy when isSelectMode is true and at least one message is selected."
+  status: done
+  notes: "Done in cycle 64. Toolbar gained a checkmark.circle IconButton next to the copy buttons that calls appState.enterSelectMode(). The shortcut bindings are scoped to SelectModeBar's buttons and only attach when select mode is active: ⌘A → selectAllVisible, ⌘C → copySelection, Esc → exitSelectMode. **Phase 8 complete.**"
 
 ---
 
