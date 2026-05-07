@@ -89,6 +89,7 @@ final class AppState: ObservableObject {
     let archiveService = ArchiveService()
     private let contextMetricsService = ContextMetrics()
     let backupEngine = BackupEngine()
+    private let claudeRunner = ClaudeRunner()
 
     @AppStorage("continuousBackupEnabled") var continuousBackupEnabled: Bool = true
 
@@ -899,26 +900,53 @@ final class AppState: ObservableObject {
     }
 
     /// Send the composer's current text into the open conversation via
-    /// `claude -p --resume`. Stub for now — the real subprocess plumbing
-    /// lands in P2.T03 (`ClaudeRunner`). Today this just acknowledges and
-    /// clears the text so the UI can be exercised.
+    /// `claude -p --resume`. The CLI appends to the JSONL; FileWatcher
+    /// (already wired in `selectSession`) picks up the new entries and
+    /// the conversation re-loads, surfacing the user prompt + Claude's
+    /// response inline.
     func submitComposer() {
         let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
         guard !isComposerSending else { return }
-        guard currentConversation != nil else {
+        guard let conv = currentConversation else {
             showToast("Open a conversation first")
             return
         }
-        // Lock the composer so the user sees in-flight state. The stub
-        // releases it after a short delay; the real ClaudeRunner will
-        // release it when the subprocess exits.
+        guard let cwd = conv.resolvedCwd else {
+            showToast("Couldn't resolve project working directory")
+            return
+        }
+
+        let sessionId = conv.sessionId
         isComposerSending = true
         composerText = ""
-        showToast("Submit not wired yet — landing in P2.T03 (ClaudeRunner).")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-            self?.isComposerSending = false
+
+        Task { [weak self] in
+            guard let self else { return }
+            let outcome = await self.claudeRunner.run(sessionId: sessionId,
+                                                     prompt: text,
+                                                     cwd: cwd)
+            await MainActor.run {
+                self.isComposerSending = false
+                switch outcome {
+                case .success:
+                    self.showToast("Sent · waiting for Claude…")
+                case .failure(let code, let stderr):
+                    let trimmed = stderr.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let detail = trimmed.isEmpty ? "exit \(code)" : trimmed.split(separator: "\n").last.map(String.init) ?? trimmed
+                    self.showToast("claude failed: \(detail)")
+                case .cancelled:
+                    self.showToast("Stopped")
+                case .launchFailed(let reason):
+                    self.showToast("Couldn't launch claude: \(reason)")
+                }
+            }
         }
+    }
+
+    /// Cancel the in-flight composer send (Phase 2 / T05 — Stop button).
+    func cancelComposer() {
+        claudeRunner.cancel()
     }
 
     func showToast(_ message: String) {

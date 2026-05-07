@@ -146,8 +146,8 @@ Tested live against a real session in this project. Findings:
 
 - id: P2.T03
   title: "Subprocess plumbing — `ClaudeRunner` service that spawns `claude -p`, streams stdout/stderr, surfaces errors as toasts, captures the run's exit status."
-  status: queued
-  notes: "Pure `Process` API. No PTY needed for `-p` mode."
+  status: done
+  notes: "Done in cycle 29. ClaudeRunner.swift wraps Process around `/usr/bin/env claude -p --resume <id> '<prompt>'` with cwd set, stdin=.nullDevice, async run() returning RunOutcome enum. submitComposer() in AppState now calls it, surfaces errors / cancellations / launch failures as toasts. cancel() sends SIGINT then SIGTERM (used by upcoming P2.T05 Stop button)."
 
 - id: P2.T04
   title: "Live append rendering — when the watched JSONL grows during a run, render the new entries with a subtle 'new' fade-in. Auto-scroll to bottom unless the user has scrolled up."
