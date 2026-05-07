@@ -55,7 +55,7 @@ the user has reported missing conversations they recognize by title.
 **`/compact` is append-only. It does not overwrite, truncate, or replace the JSONL file.**
 
 Inspected a real compacted session at
-`~/.claude/projects/-Users-sauel-dev-AtlasNativeClaude/ebe95661-63e3-4a17-9917-db93bd8a82ad.jsonl`:
+`~/.claude/projects/-Users-alice-dev-AtlasNativeClaude/ebe95661-63e3-4a17-9917-db93bd8a82ad.jsonl`:
 
 - Pre-compaction content occupies lines 1–3237. Post-compaction continuation occupies lines 3238–6297 (the file grew, didn't shrink).
 - The compaction marker is a synthetic user entry with `"isCompactSummary": true` and `"isVisibleInTranscriptOnly": true`. Its `parentUuid` points to the last pre-compaction assistant entry, so the parent chain is intact and walks all the way back to the original root.
@@ -463,8 +463,8 @@ Confirmed live on this machine: 2 sessions in saves backups, BackupEngine mirror
 
 - id: P7.T04
   title: "JSONL diff renderer — given two JSONL files, render a simple line-level diff showing added/removed entries. Plain Myers or just per-uuid set-diff is fine; we don't need a fancy git-style three-pane."
-  status: queued
-  notes: "Per-uuid diff is much simpler and matches the JSONL semantics — order doesn't change, only entries get appended/removed. Show: added uuids in green, removed in red, with a one-line summary of each (type, role, first 60 chars)."
+  status: done
+  notes: "Done in cycle 57. New VersionDiffService (per-uuid set-diff: read both files, set-difference on uuid keys, build [Hunk] for each side) and VersionDiffView (760×560 sheet with summary chips + Removed/Added sections). Wired the Diff button in VersionsView to present the sheet. Auto-orders left=older / right=newer by timestamp."
 
 - id: P7.T05
   title: "Restore-as-new-session — given a version, write its JSONL into the source project as a fresh sessionId. Reuses SessionCreator. Original is never modified; the restored copy gets `· restored from <ts>` in its title."

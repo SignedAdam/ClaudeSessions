@@ -17,6 +17,7 @@ struct VersionsView: View {
     @State private var versions: [VersionHistoryService.Version] = []
     @State private var selected: Set<String> = []
     @State private var loading: Bool = true
+    @State private var diffPair: (VersionHistoryService.Version, VersionHistoryService.Version)?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,6 +30,24 @@ struct VersionsView: View {
         .frame(width: 720, height: 540)
         .background(Theme.surface)
         .onAppear { reload() }
+        .sheet(item: Binding(
+            get: { diffPair.map { DiffPair(left: $0.0, right: $0.1) } },
+            set: { if $0 == nil { diffPair = nil } }
+        )) { pair in
+            VersionDiffView(left: pair.left, right: pair.right,
+                            isPresented: Binding(
+                                get: { diffPair != nil },
+                                set: { if !$0 { diffPair = nil } }
+                            ))
+                .environmentObject(appState)
+        }
+    }
+
+    /// Identifiable wrapper so `.sheet(item:)` can drive presentation.
+    private struct DiffPair: Identifiable {
+        let left: VersionHistoryService.Version
+        let right: VersionHistoryService.Version
+        var id: String { left.id + "|" + right.id }
     }
 
     // MARK: - Sections
@@ -109,11 +128,9 @@ struct VersionsView: View {
             Button("Reveal in Finder") { revealSelected() }
                 .controlSize(.small)
                 .disabled(selected.isEmpty)
-            Button("Diff") {
-                appState.showToast("Diff coming next cycle (T04)")
-            }
-            .controlSize(.small)
-            .disabled(selected.count != 2)
+            Button("Diff") { presentDiff() }
+                .controlSize(.small)
+                .disabled(selected.count != 2)
             Button("Restore as new…") {
                 appState.showToast("Restore coming in T05")
             }
@@ -223,6 +240,13 @@ struct VersionsView: View {
                 loading = false
             }
         }
+    }
+
+    private func presentDiff() {
+        guard selected.count == 2 else { return }
+        let pair = versions.filter { selected.contains($0.id) }
+        guard pair.count == 2 else { return }
+        diffPair = (pair[0], pair[1])
     }
 
     private func revealSelected() {
