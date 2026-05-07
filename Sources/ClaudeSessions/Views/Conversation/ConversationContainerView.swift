@@ -11,6 +11,10 @@ struct ConversationContainerView: View {
                 SessionHeaderView()
                 ConversationToolbar()
 
+                if appState.isSelectMode {
+                    SelectModeBar()
+                }
+
                 if appState.isJSONMode {
                     JSONEditorView(conversation: conversation)
                 } else {
@@ -18,7 +22,7 @@ struct ConversationContainerView: View {
                         // iMessage mode takes over the background too — authentic
                         // iOS Messages backdrop, not the active palette.
                         .background(conversationBackground)
-                    if appState.embeddedChatEnabled {
+                    if appState.embeddedChatEnabled && !appState.isSelectMode {
                         ComposerView()
                     }
                 }

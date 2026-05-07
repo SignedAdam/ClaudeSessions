@@ -507,8 +507,8 @@ This phase puts the UI on top of the existing scaffolding.
 
 - id: P8.T04
   title: "Select-mode header bar — slim strip across the top of ConversationView when isSelectMode, showing 'N selected · Copy · Cancel'. Cancel exits select mode and clears."
-  status: queued
-  notes: "New view, similar pattern to the SessionHeaderView strip. Theme.surface bg, accent border bottom."
+  status: done
+  notes: "Done in cycle 63. New SelectModeBar.swift — 'N selected' label + 'Select all visible' / 'Copy' (⌘C) / 'Cancel' (Esc) buttons. Themed with Theme.surface bg + accent border. Wired into ConversationContainerView between toolbar and content. Composer is hidden while in select mode to keep focus on the selection."
 
 - id: P8.T05
   title: "Entry points + keyboard — 'Select…' command in the toolbar or session header, ⌘A to select-all-visible while in select mode, Esc to exit. ⌘C copies the selection."
