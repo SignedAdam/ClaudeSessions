@@ -95,6 +95,11 @@ struct ContentView: View {
                 .environmentObject(appState)
                 .environmentObject(themeStore)
         }
+        .sheet(isPresented: $appState.showSubagentsSheet) {
+            SubagentsView(isPresented: $appState.showSubagentsSheet)
+                .environmentObject(appState)
+                .environmentObject(themeStore)
+        }
         .sheet(item: $appState.versionsContext) { ctx in
             VersionsView(
                 sessionId: ctx.sessionId,

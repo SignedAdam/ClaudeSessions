@@ -77,6 +77,7 @@ final class AppState: ObservableObject {
     // Archive view state
     @Published var showArchiveSheet = false
     @Published var showBackupVaultSheet = false
+    @Published var showSubagentsSheet = false
 
     // Context detail sheet
     @Published var showContextSheet = false

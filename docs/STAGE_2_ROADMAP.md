@@ -603,8 +603,8 @@ session — today they hide unless you expand the parent.
 
 - id: P10.T06
   title: "Subagents browser view — new top-level view (sibling to HomeDashboardView / ArchiveView). Lists every subagent run, filterable by free-text (matches title, parent title, project name, agent name). Click → opens that subagent session in the conversation pane."
-  status: queued
-  notes: "Reuse the dashboard's row pattern. Add an entry point in the sidebar bottom toolbar (sparkle icon → Subagents). Search field at the top, monospaced; live filter."
+  status: done
+  notes: "Done in cycle 76. Sources/ClaudeSessions/Views/SubagentsView.swift is a 640×560 sheet matching ArchiveView's pattern. Uses SubagentIndex.build to derive entries on every render; live filter on title/parent/project/agentName. Row design: sparkle icon + agentName pill (toolTint) + subagent title; second line shows project · parent title · modified date. Click → appState.selectSession + dismiss. Empty state explains what subagents are. Sheet trigger: appState.showSubagentsSheet. Sidebar footer added a 'sparkle' FooterIconButton between Archive and Backup Vault. ContentView wires the sheet."
 
 - id: P10.T07
   title: "Subagent index polish — count badge in the sidebar Subagents entry-point button; empty state copy; preserve filter state across navigations within the session."

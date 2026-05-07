@@ -465,6 +465,10 @@ struct SidebarFooter: View {
                     appState.showArchiveSheet = true
                 }
 
+                FooterIconButton(icon: "sparkle", tooltip: "Subagents — browse every subagent run across projects") {
+                    appState.showSubagentsSheet = true
+                }
+
                 FooterIconButton(icon: "tray.full", tooltip: "Backup Vault — restore deleted conversations") {
                     appState.showBackupVaultSheet = true
                 }
