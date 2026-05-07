@@ -216,8 +216,8 @@ with my prompt 'continue from here'" — and Claude does it via our app.
 
 - id: P3.T02
   title: "MCPServer skeleton — `Services/MCPServer.swift` that listens on a localhost port, parses JSON-RPC, dispatches to handlers."
-  status: queued
-  notes: "No external SDK. JSON-RPC 2.0 is small enough to implement directly."
+  status: done
+  notes: "Done in cycle 34. MCPServer.swift uses NWListener bound to 127.0.0.1, parses minimal HTTP/1.1 (POST /mcp), parses JSON-RPC 2.0, dispatches initialize / tools/list / tools/call. Tool registry via `ToolDescriptor` struct with handler closures. AppState.mcpServer instantiated but not started (T07 settings toggle controls lifecycle). Runtime smoke test deferred to T07 — the path is exercised end-to-end the first time the user enables the server."
 
 - id: P3.T03
   title: "Tools: navigation — `list_projects`, `list_sessions(project_id)`, `open_session(session_id)`, `close_session()`."

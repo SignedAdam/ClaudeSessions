@@ -98,6 +98,7 @@ final class AppState: ObservableObject {
     private let contextMetricsService = ContextMetrics()
     let backupEngine = BackupEngine()
     private let claudeRunner = ClaudeRunner()
+    let mcpServer = MCPServer()  // tools registered & started in P3.T03+
 
     @AppStorage("continuousBackupEnabled") var continuousBackupEnabled: Bool = true
 
