@@ -155,10 +155,7 @@ struct ClaudeCodeSettingsView: View {
     // MARK: - Bits
 
     private func sectionHeader(_ title: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
-            Text(title).font(.system(size: 12, weight: .semibold))
-            Text(subtitle).font(.system(size: 10)).foregroundStyle(.secondary)
-        }
+        SettingsSectionHeader(title, subtitle: subtitle)
     }
 
     private func errorRow(_ err: String) -> some View {

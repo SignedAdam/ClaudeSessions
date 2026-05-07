@@ -82,9 +82,9 @@ struct MCPSettingsView: View {
     // MARK: - Port
 
     private var portSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Port")
-                .font(.system(size: 12, weight: .semibold))
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsSectionHeader("Port",
+                                  subtitle: "Default 7531. Bound to 127.0.0.1 only — no other host on your network can reach it. Changing the port restarts the server if it's running.")
             HStack(spacing: 8) {
                 TextField("7531", text: $portText)
                     .frame(width: 80)
@@ -94,10 +94,6 @@ struct MCPSettingsView: View {
                     .disabled(!portChanged)
                 Spacer()
             }
-            Text("Default 7531. Bound to 127.0.0.1 only — no other host on your network can reach it. Changing the port restarts the server if it's running.")
-                .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -115,11 +111,8 @@ struct MCPSettingsView: View {
 
     private var snippetSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Connect from Claude Code")
-                .font(.system(size: 12, weight: .semibold))
-            Text("Add this entry to `mcpServers` in Claude Code's settings:")
-                .font(.system(size: 11))
-                .foregroundStyle(.secondary)
+            SettingsSectionHeader("Connect from Claude Code",
+                                  subtitle: "Add this entry to `mcpServers` in Claude Code's settings:")
 
             Text(snippetText)
                 .font(.system(size: 11, design: .monospaced))
@@ -159,15 +152,11 @@ struct MCPSettingsView: View {
 
     private var toolsList: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Exposed tools")
-                .font(.system(size: 12, weight: .semibold))
+            SettingsSectionHeader("Exposed tools",
+                                  subtitle: "delete_to_trash and the launch tools spawn UI side-effects. MCP clients should confirm with the user before invoking them.")
             Text("Navigation: list_projects, list_sessions, open_session, close_session\nRead: read_session_metadata, read_dialogue_only, read_full_transcript\nOrganize: star, unstar, hide, unhide, archive, unarchive, move_to_project, delete_to_trash\nLaunch: extract_and_open, resume_in_terminal")
                 .font(.system(size: 10, design: .monospaced))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-            Text("delete_to_trash and the launch tools spawn UI side-effects. MCP clients should confirm with the user before invoking them.")
-                .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(Theme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }

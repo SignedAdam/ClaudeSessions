@@ -297,8 +297,8 @@ Window: `.frame(width: 520, height: 420)` on `SettingsView`'s `TabView`. Usable 
 
 - id: P4.T05
   title: "Section dividers + spacing pass on every tab — currently inconsistent."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 44. Extract converted to ScrollView+VStack+SettingsSectionHeader pattern. ClaudeCode's local sectionHeader() now delegates to the shared SettingsSectionHeader. MCP's inline 12pt-semibold Text+caption pairs replaced with SettingsSectionHeader. Backup keeps its 14pt page header (intentional — that's page title, not section header). All seven tabs now share one section-header component. **Phase 4 complete.**"
 
 ---
 

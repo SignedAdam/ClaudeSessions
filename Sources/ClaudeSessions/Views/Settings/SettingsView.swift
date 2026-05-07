@@ -147,43 +147,40 @@ struct ExtractSettingsView: View {
     @AppStorage("extractMode") private var extractModeRaw: String = ExtractMode.newSession.rawValue
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Extract Mode")
-                .font(.system(size: 13, weight: .semibold))
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                SettingsSectionHeader(
+                    "Extract mode",
+                    subtitle: "When you click the Extract button, Claude Sessions strips tool calls, tool results, and system messages — leaving only the human↔Claude dialogue — and opens it in Claude Code."
+                )
 
-            Text("When you click the Extract button, Claude Sessions strips tool calls, tool results, and system messages — leaving only the human↔Claude dialogue — and opens it in Claude Code.")
-                .font(.system(size: 11))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 10) {
+                    RadioOption(
+                        title: "New resumable session",
+                        subtitle: "Write a clean JSONL file into the same project and open with `claude --resume`. The new session appears in Claude Code's own resume picker. The original session is untouched.",
+                        isSelected: extractModeRaw == ExtractMode.newSession.rawValue,
+                        recommended: true
+                    ) {
+                        extractModeRaw = ExtractMode.newSession.rawValue
+                    }
 
-            VStack(alignment: .leading, spacing: 10) {
-                RadioOption(
-                    title: "New resumable session",
-                    subtitle: "Write a clean JSONL file into the same project and open with `claude --resume`. The new session appears in Claude Code's own resume picker. The original session is untouched.",
-                    isSelected: extractModeRaw == ExtractMode.newSession.rawValue,
-                    recommended: true
-                ) {
-                    extractModeRaw = ExtractMode.newSession.rawValue
+                    RadioOption(
+                        title: "Piped prompt (fresh context)",
+                        subtitle: "Pipe the cleaned dialogue into a brand new `claude` session as its first prompt. Faster, no on-disk session file, but Claude Code starts completely fresh.",
+                        isSelected: extractModeRaw == ExtractMode.pipedPrompt.rawValue,
+                        recommended: false
+                    ) {
+                        extractModeRaw = ExtractMode.pipedPrompt.rawValue
+                    }
                 }
 
-                RadioOption(
-                    title: "Piped prompt (fresh context)",
-                    subtitle: "Pipe the cleaned dialogue into a brand new `claude` session as its first prompt. Faster, no on-disk session file, but Claude Code starts completely fresh.",
-                    isSelected: extractModeRaw == ExtractMode.pipedPrompt.rawValue,
-                    recommended: false
-                ) {
-                    extractModeRaw = ExtractMode.pipedPrompt.rawValue
-                }
+                Text("You can override per-click by right-clicking the Extract button.")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.textTertiary)
             }
-
-            Spacer()
-
-            Text("You can override per-click by right-clicking the Extract button.")
-                .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
