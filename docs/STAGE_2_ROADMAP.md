@@ -428,8 +428,28 @@ exists on the user's disk. T01 audits them; T02 unifies them.
 
 - id: P7.T01
   title: "Audit existing version sources — list every place a previous version of a given session might live (saves backups dir, BackupEngine mirror + .orig-* snapshots, archive entries). Document the canonical key each source uses to associate versions with the same session."
-  status: queued
-  notes: "Output: a short note in this roadmap describing the inventory + which key links them."
+  status: done
+  notes: "Done in cycle 54. See findings below."
+
+#### Findings (cycle 54 — version-source inventory)
+
+A given session can have versions in **four** places on disk. All four use **`sessionId` (UUID)** as the canonical key. That's the join column for `VersionHistoryService` in T02.
+
+| # | Source kind | Path layout | Trigger |
+|---|---|---|---|
+| 1 | `.live` | `~/.claude/projects/<slug>/<sessionId>.jsonl` | the source-of-truth file Claude Code writes |
+| 2 | `.saveBackup` | `~/.claude-sessions-backups/<sessionId>/<yyyy-MM-dd'T'HH-mm-ss>.jsonl` | written by `BackupService.backup` before every Save (cycle 03 era). Retention: last 20 |
+| 3 | `.vaultLive` / `.vaultSnapshot` | `~/.ClaudeSessions/backup/projects/<slug>/<sessionId>.jsonl` and `<…>.jsonl.orig-<unix-ts>` | written by `BackupEngine` (cycle 22) — live mirror + rotated snapshots when a rewrite is detected (cycle 25) |
+| 4 | `.archive` | `~/.claude-sessions-archive/<projectId>/<sessionId>.jsonl` (+ `.meta.json` companion) | written by `ArchiveService.archive` |
+
+Confirmed live on this machine: 2 sessions in saves backups, BackupEngine mirror is populated with `.orig-*` snapshots (e.g. `sessions-index.json.orig-1776801954` — though those are project metadata, not session JSONL — the session-level snapshots follow the same pattern), 1 archived session.
+
+#### Implications for T02
+
+- **Listing API** should walk all four paths for a given `sessionId`. Source #2 needs a directory listing; #3 needs a directory listing for the project slug to find both the live mirror and any `.orig-*` matching `<sessionId>.jsonl.orig-*`; #4 reads the meta.json companion.
+- **Slug-to-sessionId crossover**: source #3 organizes by project slug, not by session id. We need both pieces of info to find vault entries. The session's `projectPath` (or `resolvedCwd` via `SlugResolver`) gets us the slug.
+- **Timestamp parsing**: each source uses a different format — yyyy-MM-dd'T'HH-mm-ss for saves, unix-ts for vault snapshots, ISO for archive meta. Normalize to `Date` in the unified `Version` struct.
+- **Source-kind ordering for the UI** (T03): live first, then save backups newest-first, then vault snapshots newest-first, then archive (if present). The "current" version is always source #1.
 
 - id: P7.T02
   title: "VersionHistoryService — given a sessionId, return a chronologically-sorted [Version] with {timestamp, source kind, filePath, size, messageCount?, isCurrent}. Filesystem-based; no manifest dependency."
