@@ -7,7 +7,9 @@ import SwiftUI
 struct SubagentsView: View {
     @EnvironmentObject var appState: AppState
     @Binding var isPresented: Bool
-    @State private var query: String = ""
+    /// Persists across close-reopen cycles (and across launches), so the
+    /// user's filter survives glancing back into the sheet.
+    @AppStorage("subagentsFilter") private var query: String = ""
 
     private var entries: [SubagentIndexEntry] {
         SubagentIndex.build(from: appState.projects)

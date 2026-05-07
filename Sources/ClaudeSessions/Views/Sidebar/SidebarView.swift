@@ -441,6 +441,12 @@ struct SidebarFooter: View {
         appState.archiveService.listArchived().count
     }
 
+    private var subagentCount: Int {
+        appState.projects.reduce(0) { acc, p in
+            acc + p.sessions.reduce(0) { $0 + $1.subagents.count }
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             Rectangle().fill(Theme.border.opacity(0.4)).frame(height: 1)
@@ -465,7 +471,11 @@ struct SidebarFooter: View {
                     appState.showArchiveSheet = true
                 }
 
-                FooterIconButton(icon: "sparkle", tooltip: "Subagents — browse every subagent run across projects") {
+                FooterIconButton(
+                    icon: "sparkle",
+                    tooltip: "Subagents — browse every subagent run across projects",
+                    badge: subagentCount
+                ) {
                     appState.showSubagentsSheet = true
                 }
 
@@ -511,6 +521,9 @@ private struct FooterIconButton: View {
     let icon: String
     let tooltip: String
     var spinning: Bool = false
+    /// When non-nil and > 0, a small numeric badge renders in the
+    /// top-right corner. Use for "N pending items" cues.
+    var badge: Int? = nil
     let action: () -> Void
     @State private var hovered = false
 
@@ -531,6 +544,17 @@ private struct FooterIconButton: View {
                     RoundedRectangle(cornerRadius: 5)
                         .strokeBorder(Theme.border.opacity(0.5), lineWidth: 1)
                 )
+                .overlay(alignment: .topTrailing) {
+                    if let b = badge, b > 0 {
+                        Text(b > 99 ? "99+" : "\(b)")
+                            .font(.system(size: 8, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Theme.toolTint)
+                            .padding(.horizontal, 3).padding(.vertical, 1)
+                            .background(Theme.toolTint.opacity(0.18))
+                            .clipShape(Capsule())
+                            .offset(x: 3, y: -3)
+                    }
+                }
         }
         .buttonStyle(.plain)
         .onHover { h in hovered = h }

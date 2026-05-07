@@ -608,8 +608,8 @@ session — today they hide unless you expand the parent.
 
 - id: P10.T07
   title: "Subagent index polish — count badge in the sidebar Subagents entry-point button; empty state copy; preserve filter state across navigations within the session."
-  status: queued
-  notes: "Mirror the favorites count pill style for consistency. Empty state explains what subagents are and where they come from."
+  status: done
+  notes: "Done in cycle 77. FooterIconButton gained an optional `badge: Int?` prop that renders a tiny toolTint pill in the top-right corner when > 0 (caps display at 99+). SidebarFooter computes `subagentCount` by summing `sessions[i].subagents.count` across projects (cheaper than building the full index just for a number) and passes it. Empty state copy was already shipped in cycle 76, kept. Filter persistence: SubagentsView's `query` is now `@AppStorage(\"subagentsFilter\")` instead of `@State`, so close→reopen preserves the filter (and across launches as a bonus). Phase 10 complete: T01-T07 done."
 
 ---
 
