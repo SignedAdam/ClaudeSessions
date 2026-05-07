@@ -107,6 +107,14 @@ gh release create v0.1.0 build/Claude-Sessions-0.1.0.dmg build/Claude-Sessions-0
 - Xcode command line tools / Swift 5.9+
 - Claude Code CLI for resume, clean continuation, and embedded chat features
 
+## How this was built
+
+Stage 2 of this app — 10 phases of features across backup, MCP, version history, multi-root scanning, subagent indexing — was built across **78 autonomous Claude Code cycles** using a roadmap-driven loop technique.
+
+The roadmap that drove it: [`docs/STAGE_2_ROADMAP.md`](docs/STAGE_2_ROADMAP.md).
+The full cycle diary: [`docs/cycles/`](docs/cycles).
+The technique extracted: **[claude-loop](https://github.com/SignedAdam/claude-loop)** — the `/loop` prompt, the roadmap schema, and the operational discipline, packaged so it's reusable for any project.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
