@@ -478,6 +478,45 @@ Confirmed live on this machine: 2 sessions in saves backups, BackupEngine mirror
 
 ---
 
+## Phase 8 — Multi-select copy mode
+
+**Goal:** Let the user pick an arbitrary subset of messages from a
+conversation and copy them as a formatted block. Stage 1 left two pieces
+of infrastructure unfinished: `AppState.isSelectMode` and
+`AppState.selectedMessageIds` (cycle 09 era stubs) plus
+`ClipboardService.copyMessages` exist already, but no UI ever wires them.
+
+This phase puts the UI on top of the existing scaffolding.
+
+### Tasks
+
+- id: P8.T01
+  title: "Audit existing select-mode infrastructure — confirm AppState properties, ClipboardService.copyMessages, and any in-flight references. Document the API gaps to fill."
+  status: queued
+  notes: "Quick research. Output: short note in this roadmap with the surface area that exists vs what needs adding."
+
+- id: P8.T02
+  title: "AppState helpers — toggleSelection(messageId:), selectAllVisible(), enterSelectMode(), exitSelectMode(). Wire copyMessages so it pulls from selectedMessageIds + currentConversation.displayMessages."
+  status: queued
+  notes: "Pure state methods, no UI. Each ≤10 lines."
+
+- id: P8.T03
+  title: "Message row checkbox — render a small left-edge checkbox in user/assistant message views when isSelectMode, taps toggle via AppState. Hover/edit overlays should disable while selecting (or simply not interfere)."
+  status: queued
+  notes: "UserMessageView + AssistantMessageView. Reuse the existing message container — just inject a leading column."
+
+- id: P8.T04
+  title: "Select-mode header bar — slim strip across the top of ConversationView when isSelectMode, showing 'N selected · Copy · Cancel'. Cancel exits select mode and clears."
+  status: queued
+  notes: "New view, similar pattern to the SessionHeaderView strip. Theme.surface bg, accent border bottom."
+
+- id: P8.T05
+  title: "Entry points + keyboard — 'Select…' command in the toolbar or session header, ⌘A to select-all-visible while in select mode, Esc to exit. ⌘C copies the selection."
+  status: queued
+  notes: "Where to put the entry: a small button in the conversation toolbar's quick-actions cluster reads naturally. ⌘C should only override default copy when isSelectMode is true and at least one message is selected."
+
+---
+
 ## Decomposition queue
 
 Phases the loop should expand into tasks once the earlier phases are
@@ -485,6 +524,5 @@ mostly done. Don't decompose these now — let the loop break them down
 when their turn comes, so the tasks reflect the actual code state at that
 point rather than guesses now.
 
-- **Phase 8 — Multi-select copy mode** (still missing from Stage 1)
 - **Phase 9 — Pin / star polish + dashboard pinned section**
 - **Phase 10 — Custom filesystem locations + subagent search index**
