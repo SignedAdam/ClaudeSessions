@@ -458,8 +458,8 @@ Confirmed live on this machine: 2 sessions in saves backups, BackupEngine mirror
 
 - id: P7.T03
   title: "Versions sheet UI — modal sheet listing all versions for one session. Each row: timestamp, source kind chip, size, message count. Multi-select up to 2 rows for diff. Single-select shows preview pane."
-  status: queued
-  notes: "Pattern after BackupVaultView. Reachable via session-row context menu and a button in SessionHeaderView."
+  status: done
+  notes: "Done in cycle 56. New Views/VersionsView.swift — 720x540 sheet with chip-coded rows (live=accent, saveBackup=success, vault*=human, archive=warn). Plain click replaces selection; ⌘-click adds up to 2 for diff. Footer hints + Reveal in Finder + Diff (T04 stub) + Restore as new (T05 stub) buttons. Versions loaded async via Task.detached. Entry-point wiring (context menu + header button) is T06."
 
 - id: P7.T04
   title: "JSONL diff renderer — given two JSONL files, render a simple line-level diff showing added/removed entries. Plain Myers or just per-uuid set-diff is fine; we don't need a fancy git-style three-pane."
