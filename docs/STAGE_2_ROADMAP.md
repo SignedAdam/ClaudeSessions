@@ -517,6 +517,48 @@ This phase puts the UI on top of the existing scaffolding.
 
 ---
 
+## Phase 9 — Pin / star polish + dashboard pinned section
+
+**Goal:** Make starred conversations more discoverable. Today they appear
+in a sidebar section (only when non-empty) but the dashboard ignores
+them entirely. The starred set is also stable enough to deserve a
+dedicated dashboard section like Recent — many users have a small core
+of "active" conversations they revisit constantly.
+
+**Existing infrastructure:**
+- `FavoritesStore` (singleton, persisted) with `favoriteSessionIds: Set<String>`, toggle/add/remove/isFavorite/count.
+- Sidebar's Favorites section already wired (renders when non-empty).
+- HomeDashboardView has Recent / Top Projects / Stats sections; no Pinned.
+
+### Tasks
+
+- id: P9.T01
+  title: "Audit existing star/favorites surfaces — confirm FavoritesStore API, sidebar Favorites section behavior, and the per-row star toggle. Document gaps to fill."
+  status: queued
+  notes: "Quick research. Output: short note in the roadmap."
+
+- id: P9.T02
+  title: "HomeDashboardView pinned section — add 'Starred' between the greeting and Recent Sessions (or above Recent). Show up to 8 starred sessions in the same compact pair-row layout. Click opens. Hidden when no stars."
+  status: queued
+  notes: "Reuses recentSessionsSection's row pattern. Sort: most recently modified first within the starred set."
+
+- id: P9.T03
+  title: "Sidebar Favorites empty state — when the user has 0 favorites, the section currently doesn't render. Add a one-time hint somewhere (sidebar tip below project list? or just keep current behavior?). Decide and ship."
+  status: queued
+  notes: "Default decision: keep hidden when empty. The dashboard hint covers discoverability. Mark this task `skipped` if the audit confirms current behavior is fine."
+
+- id: P9.T04
+  title: "Star toggle micro-interaction — when the user clicks the star, animate the icon (scale 1.0→1.2→1.0 + brief warnTint flash for star, dim for unstar). Adds delight without changing behavior."
+  status: queued
+  notes: "Adds to SessionRow's existing star button. ~10 lines of animation modifiers."
+
+- id: P9.T05
+  title: "Favorites count badge in sidebar — small monospaced count next to the 'Favorites' section header so the user can see at a glance how many they've starred."
+  status: queued
+  notes: "Cosmetic. Drop into the existing FavoritesSection header HStack."
+
+---
+
 ## Decomposition queue
 
 Phases the loop should expand into tasks once the earlier phases are
@@ -524,5 +566,4 @@ mostly done. Don't decompose these now — let the loop break them down
 when their turn comes, so the tasks reflect the actual code state at that
 point rather than guesses now.
 
-- **Phase 9 — Pin / star polish + dashboard pinned section**
 - **Phase 10 — Custom filesystem locations + subagent search index**
