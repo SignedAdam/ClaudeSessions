@@ -559,6 +559,60 @@ of "active" conversations they revisit constantly.
 
 ---
 
+## Phase 10 — Custom filesystem locations + subagent search index
+
+**Goal:** Two related broaden-the-input moves. (1) Let the user point
+Claude Sessions at extra scan roots beyond the hardcoded
+`~/.claude/projects/` — useful for archived sets, backup mounts, or a
+synced second machine's directory. (2) Surface subagent runs through a
+dedicated browseable index, not just as nested children of their parent
+session — today they hide unless you expand the parent.
+
+**Existing infrastructure:**
+- `ProjectScanner.scan()` reads a hardcoded `home + "/.claude/projects"` (one root). Returns `[Project]` with embedded `[SessionInfo]` and nested `subagents`.
+- Subagents live at `<projectDir>/<parentSessionId>/subagents/agent-*.jsonl` and are stitched into `SessionInfo.subagents` by the scanner. They render as indented rows under the parent in the sidebar (visible only when expanded). No browseable cross-session view.
+- Settings panels are simple SwiftUI sub-views in `Views/Settings/` — `BackupSettingsView` is the closest precedent for a list + add/remove UI.
+- No global search / command bar exists. Filter-on-list is the right pattern for the subagent surface.
+
+### Tasks
+
+- id: P10.T01
+  title: "Audit scan-root and subagent surfaces — locate every hardcoded ~/.claude/projects/ reference, confirm the slug/path collision risk across roots, and inventory how subagents are currently rendered. Document gaps."
+  status: queued
+  notes: "Findings already partly cataloged: ProjectScanner.swift line 6 is the single hardcoded root; SlugResolver assumes one root; FSEvents in BackupEngine watches that one path. Subagents shown in sidebar only via SessionRow indented under parent. No standalone view. T01 just confirms and writes it up — no code."
+
+- id: P10.T02
+  title: "ScanRootStore — UserDefaults-backed singleton holding the extra scan-root URLs (default `~/.claude/projects/` is implicit and always included). API: roots(), addRoot(URL), removeRoot(URL), persisted across launches."
+  status: queued
+  notes: "Mirror the FavoritesStore pattern (singleton + @Published + UserDefaults). Validate on add: directory exists, is a directory, is readable. De-dupe paths (resolve symlinks via .resolvingSymlinksInPath). Don't allow adding the default root as a custom one."
+
+- id: P10.T03
+  title: "Settings panel — 'Scan locations'. List the default root (non-removable, marked as such) plus any custom roots. Add button → NSOpenPanel folder picker. Remove buttons next to each custom row. Live count of projects/sessions per root."
+  status: queued
+  notes: "Lives in Views/Settings/. Add a SettingsTab case. Uses BackupSettingsView's row layout style. Per-root counts can come from a quick scan or be lazy."
+
+- id: P10.T04
+  title: "ProjectScanner multi-root — accept a list of roots (default + custom). Scan each independently. Tag every Project with its source root URL so we can disambiguate same-named slugs across roots. Sidebar: when more than one root is configured, show the root nickname (last path component) as a small tag on each project."
+  status: queued
+  notes: "Project.id should incorporate the root, e.g. `<rootHash>:<slug>` so SwiftUI ForEach diffing stays correct. Don't break the existing one-root path — when only the default root is configured, no tags render and behavior is identical to today."
+
+- id: P10.T05
+  title: "Build subagent index — a flat `[SubagentIndexEntry]` derived from all scanned projects. Each entry: subagent SessionInfo, parent SessionInfo, project, modified date, message count, agent name (parsed from agent-<NAME>-<uuid>.jsonl filename if available)."
+  status: queued
+  notes: "Pure computed-property over `appState.projects`. No new I/O. Derived on demand. Sort by modified desc by default."
+
+- id: P10.T06
+  title: "Subagents browser view — new top-level view (sibling to HomeDashboardView / ArchiveView). Lists every subagent run, filterable by free-text (matches title, parent title, project name, agent name). Click → opens that subagent session in the conversation pane."
+  status: queued
+  notes: "Reuse the dashboard's row pattern. Add an entry point in the sidebar bottom toolbar (sparkle icon → Subagents). Search field at the top, monospaced; live filter."
+
+- id: P10.T07
+  title: "Subagent index polish — count badge in the sidebar Subagents entry-point button; empty state copy; preserve filter state across navigations within the session."
+  status: queued
+  notes: "Mirror the favorites count pill style for consistency. Empty state explains what subagents are and where they come from."
+
+---
+
 ## Decomposition queue
 
 Phases the loop should expand into tasks once the earlier phases are
@@ -566,4 +620,4 @@ mostly done. Don't decompose these now — let the loop break them down
 when their turn comes, so the tasks reflect the actual code state at that
 point rather than guesses now.
 
-- **Phase 10 — Custom filesystem locations + subagent search index**
+_(empty — all queued phases decomposed)_
