@@ -593,8 +593,8 @@ session — today they hide unless you expand the parent.
 
 - id: P10.T04
   title: "ProjectScanner multi-root — accept a list of roots (default + custom). Scan each independently. Tag every Project with its source root URL so we can disambiguate same-named slugs across roots. Sidebar: when more than one root is configured, show the root nickname (last path component) as a small tag on each project."
-  status: queued
-  notes: "Project.id should incorporate the root, e.g. `<rootHash>:<slug>` so SwiftUI ForEach diffing stays correct. Don't break the existing one-root path — when only the default root is configured, no tags render and behavior is identical to today."
+  status: done
+  notes: "Done in cycle 74. Project model gained `slug: String` and `sourceRoot: URL`; `id` is now `<rootKey>:<slug>` (rootKey = base-36 hash of the root's symlink-resolved standardized path). Scanner refactored: scan() preserved as a no-arg shim that calls scan(roots: [defaultRoot]); scan(roots:) iterates and merges; private scanOne(root:) does what the old scan() did, parameterized on root. AppState.loadProjects passes ScanRootStore.shared.allRoots(). ArchiveService caller switched to `project.slug` so archive paths stay back-compat (no rootHash leak). ScanRootStore.rootKey(for:) and defaultRoot marked `nonisolated` so the (non-actor) scanner can call them. Sidebar: ProjectSection got a `var rootTag: String? = nil` prop that renders a small monospaced surface-bg pill next to the project name; SidebarView populates it conditionally on `scanRootStore.allRoots().count > 1`. Single-root behavior is identical to before."
 
 - id: P10.T05
   title: "Build subagent index — a flat `[SubagentIndexEntry]` derived from all scanned projects. Each entry: subagent SessionInfo, parent SessionInfo, project, modified date, message count, agent name (parsed from agent-<NAME>-<uuid>.jsonl filename if available)."

@@ -203,7 +203,8 @@ final class AppState: ObservableObject {
 
     func loadProjects() async {
         isLoading = true
-        let discovered = await scanner.scan()
+        let roots = ScanRootStore.shared.allRoots()
+        let discovered = await scanner.scan(roots: roots)
         projects = discovered
         isLoading = false
     }
@@ -886,7 +887,7 @@ final class AppState: ObservableObject {
             if selectedSessionId == session.id {
                 closeCurrentSession()
             }
-            try archiveService.archive(session: session, projectId: project.id, projectName: project.name)
+            try archiveService.archive(session: session, projectId: project.slug, projectName: project.name)
             conversationCache.removeValue(forKey: session.id)
             await loadProjects()
             showToast("Archived · \(session.title)")

@@ -3,7 +3,15 @@ import Foundation
 // MARK: - Project & Session
 
 struct Project: Identifiable, Equatable {
+    /// Composite identity, `<rootKey>:<slug>`. Use this for SwiftUI ForEach
+    /// and identity comparisons across roots.
     let id: String
+    /// Bare project-directory name under the source root (e.g.
+    /// `-Users-alice-dev-foo`). Stable across roots; used for archive paths
+    /// and slug-based lookups.
+    let slug: String
+    /// The scan root this project lives under.
+    let sourceRoot: URL
     let name: String
     let originalPath: String
     var sessions: [SessionInfo]

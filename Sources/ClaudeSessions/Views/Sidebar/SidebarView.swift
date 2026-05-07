@@ -4,6 +4,7 @@ struct SidebarView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var hiddenStore: HiddenStore
     @EnvironmentObject var favoritesStore: FavoritesStore
+    @EnvironmentObject var scanRootStore: ScanRootStore
     @State private var expandedProjects: Set<String> = []
     @State private var favoritesExpanded: Bool = true
 
@@ -83,6 +84,7 @@ struct SidebarView: View {
                                 isProjectHidden: hiddenStore.isProjectHidden(project.id),
                                 hiddenSessionIds: hiddenStore.hiddenSessionIds,
                                 favoriteIds: favoritesStore.favoriteSessionIds,
+                                rootTag: scanRootStore.allRoots().count > 1 ? project.sourceRoot.lastPathComponent : nil,
                                 onToggleExpand: {
                                     withAnimation(.easeInOut(duration: 0.12)) {
                                         if expandedProjects.contains(project.id) {
@@ -318,6 +320,10 @@ struct ProjectSection: View {
     let isProjectHidden: Bool
     let hiddenSessionIds: Set<String>
     let favoriteIds: Set<String>
+    /// When set, renders a small tag next to the project name showing which
+    /// scan root this project came from. Only populated when the user has
+    /// configured more than one scan root.
+    var rootTag: String? = nil
     let onToggleExpand: () -> Void
     let onSelectSession: (SessionInfo) -> Void
     let onToggleProjectHidden: () -> Void
@@ -341,6 +347,14 @@ struct ProjectSection: View {
                         .foregroundStyle(Theme.text)
                         .italic(isProjectHidden)
                         .lineLimit(1)
+                    if let tag = rootTag {
+                        Text(tag)
+                            .font(.system(size: 9, design: .monospaced))
+                            .foregroundStyle(Theme.textSecondary)
+                            .padding(.horizontal, 5).padding(.vertical, 1)
+                            .background(Theme.surface)
+                            .clipShape(Capsule())
+                    }
                     if isProjectHidden {
                         Image(systemName: "eye.slash")
                             .font(.system(size: 8))

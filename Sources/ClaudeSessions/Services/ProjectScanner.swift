@@ -1,17 +1,33 @@
 import Foundation
 
 struct ProjectScanner {
-    private let claudeProjectsPath: String = {
-        let home = FileManager.default.homeDirectoryForCurrentUser.path
-        return home + "/.claude/projects"
-    }()
-
+    /// Scan the default `~/.claude/projects/` root only.
+    /// Kept for callers that don't know about ScanRootStore.
     func scan() async -> [Project] {
+        await scan(roots: [ScanRootStore.defaultRoot])
+    }
+
+    /// Scan one or more roots and return the union of their projects.
+    /// Each project is tagged with its `sourceRoot` and gets a composite id
+    /// (`<rootKey>:<slug>`) so SwiftUI ForEach diffing stays correct when
+    /// multiple roots host a project with the same slug.
+    func scan(roots: [URL]) async -> [Project] {
+        var all: [Project] = []
+        for root in roots {
+            all.append(contentsOf: await scanOne(root: root))
+        }
+        all.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        return all
+    }
+
+    private func scanOne(root: URL) async -> [Project] {
         let fm = FileManager.default
+        let claudeProjectsPath = root.path
         guard let dirContents = try? fm.contentsOfDirectory(atPath: claudeProjectsPath) else {
             return []
         }
 
+        let rootKey = ScanRootStore.rootKey(for: root)
         var projects: [Project] = []
 
         for dirName in dirContents {
@@ -131,7 +147,9 @@ struct ProjectScanner {
 
             if !sessions.isEmpty {
                 projects.append(Project(
-                    id: dirName,
+                    id: rootKey + ":" + dirName,
+                    slug: dirName,
+                    sourceRoot: root,
                     name: projectName,
                     originalPath: originalPath,
                     sessions: sessions
@@ -139,8 +157,6 @@ struct ProjectScanner {
             }
         }
 
-        // Sort projects alphabetically
-        projects.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         return projects
     }
 

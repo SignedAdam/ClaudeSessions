@@ -31,13 +31,14 @@ final class ScanRootStore: ObservableObject {
 
     /// Stable canonical key for a root URL — used as the `rootHash` prefix
     /// in `Project.id` so SwiftUI ForEach diffing stays correct across
-    /// roots that happen to host the same slug.
-    static func rootKey(for url: URL) -> String {
+    /// roots that happen to host the same slug. Pure computation, callable
+    /// off the main actor (used from `ProjectScanner`).
+    nonisolated static func rootKey(for url: URL) -> String {
         let resolved = url.resolvingSymlinksInPath().standardizedFileURL.path
         return String(UInt(bitPattern: resolved.hashValue), radix: 36)
     }
 
-    static let defaultRoot: URL = {
+    nonisolated static let defaultRoot: URL = {
         let home = FileManager.default.homeDirectoryForCurrentUser.path
         return URL(fileURLWithPath: home + "/.claude/projects", isDirectory: true)
     }()
