@@ -9,10 +9,13 @@ import AppKit
 /// See: https://docs.claude.com/en/docs/claude-code/settings
 struct ClaudeCodeSettingsView: View {
     @StateObject private var store = ClaudeCodeConfigStore()
+    @AppStorage("embeddedChatEnabled") private var embeddedChatEnabled: Bool = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
+            Divider()
+            embeddedChatSection
             Divider()
             cleanupSection
             Divider()
@@ -26,6 +29,20 @@ struct ClaudeCodeSettingsView: View {
         }
         .padding()
         .onAppear { store.load() }
+    }
+
+    // MARK: - Embedded chat
+
+    private var embeddedChatSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            sectionHeader("Embedded chat",
+                          subtitle: "When enabled, an inline composer at the bottom of every conversation lets you reply via `claude -p --resume`. Disable to keep all interactive work in your terminal.")
+            Toggle(isOn: $embeddedChatEnabled) {
+                Text("Show composer on conversation view")
+                    .font(.system(size: 12))
+            }
+            .toggleStyle(.switch)
+        }
     }
 
     // MARK: - Header

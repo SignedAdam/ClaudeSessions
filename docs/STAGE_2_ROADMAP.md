@@ -161,8 +161,8 @@ Tested live against a real session in this project. Findings:
 
 - id: P2.T06
   title: "Setting: enable/disable embedded chat — for users who prefer to keep all interactive work in their terminal."
-  status: queued
-  notes: "Default on. Settings → Claude Code tab."
+  status: done
+  notes: "Done in cycle 32. Toggle added to Settings → Claude Code tab as 'Embedded chat' section. Bound to existing @AppStorage(embeddedChatEnabled), default true. ConversationContainerView already gates ComposerView on this flag."
 
 ---
 
