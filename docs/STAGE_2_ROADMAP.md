@@ -403,6 +403,61 @@ half-finished while shipping fast.
 
 ---
 
+## Phase 7 — Conversation version history + diff
+
+**Goal:** Surface the multiple versions of a session that already exist on
+disk (Save backups, Backup Vault snapshots, .orig-* rotated copies,
+archive entries) as a single **Versions** sheet per session. Let the user
+preview, diff, and restore any version as a new session — without
+guessing which copy is the right one.
+
+**Existing infrastructure to lean on:**
+
+- `SessionForker` writes a backup before every save under
+  `~/.claude-sessions-backups/<sessionId>/<unix-ts>.jsonl` (cycle 03 era).
+- `BackupEngine` mirrors `~/.claude/projects/` to
+  `~/.ClaudeSessions/backup/projects/<slug>/<sessionId>.jsonl`, plus
+  `.orig-<unix-ts>` rotated snapshots when a rewrite is detected (cycle 25).
+- `ArchiveService` listArchived returns archive entries with
+  `originalPath` metadata.
+
+These three sources together represent every "version" of a session that
+exists on the user's disk. T01 audits them; T02 unifies them.
+
+### Tasks
+
+- id: P7.T01
+  title: "Audit existing version sources — list every place a previous version of a given session might live (saves backups dir, BackupEngine mirror + .orig-* snapshots, archive entries). Document the canonical key each source uses to associate versions with the same session."
+  status: queued
+  notes: "Output: a short note in this roadmap describing the inventory + which key links them."
+
+- id: P7.T02
+  title: "VersionHistoryService — given a sessionId, return a chronologically-sorted [Version] with {timestamp, source kind, filePath, size, messageCount?, isCurrent}. Filesystem-based; no manifest dependency."
+  status: queued
+  notes: "Source kinds: .live (current source file), .saveBackup, .vaultSnapshot, .vaultLive, .archive. Reuse BackupVaultService where possible."
+
+- id: P7.T03
+  title: "Versions sheet UI — modal sheet listing all versions for one session. Each row: timestamp, source kind chip, size, message count. Multi-select up to 2 rows for diff. Single-select shows preview pane."
+  status: queued
+  notes: "Pattern after BackupVaultView. Reachable via session-row context menu and a button in SessionHeaderView."
+
+- id: P7.T04
+  title: "JSONL diff renderer — given two JSONL files, render a simple line-level diff showing added/removed entries. Plain Myers or just per-uuid set-diff is fine; we don't need a fancy git-style three-pane."
+  status: queued
+  notes: "Per-uuid diff is much simpler and matches the JSONL semantics — order doesn't change, only entries get appended/removed. Show: added uuids in green, removed in red, with a one-line summary of each (type, role, first 60 chars)."
+
+- id: P7.T05
+  title: "Restore-as-new-session — given a version, write its JSONL into the source project as a fresh sessionId. Reuses SessionCreator. Original is never modified; the restored copy gets `· restored from <ts>` in its title."
+  status: queued
+  notes: "BackupVaultService.restore() exists for the vault case but writes to the same sessionId. We need a copy-as-new variant that always assigns a new id."
+
+- id: P7.T06
+  title: "Wire entry points — 'Versions…' menu item in the session-row context menu, + a 'Versions' button in SessionHeaderView's right-side cluster. Sets appState.versionsContext and presents the sheet."
+  status: queued
+  notes: "Match the pattern Archive / Backup Vault use for sheet presentation."
+
+---
+
 ## Decomposition queue
 
 Phases the loop should expand into tasks once the earlier phases are
@@ -410,7 +465,6 @@ mostly done. Don't decompose these now — let the loop break them down
 when their turn comes, so the tasks reflect the actual code state at that
 point rather than guesses now.
 
-- **Phase 7 — Conversation version history + diff** (deferred from Stage 1)
 - **Phase 8 — Multi-select copy mode** (still missing from Stage 1)
 - **Phase 9 — Pin / star polish + dashboard pinned section**
 - **Phase 10 — Custom filesystem locations + subagent search index**
