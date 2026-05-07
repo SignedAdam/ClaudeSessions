@@ -20,21 +20,24 @@ private struct BackupSettingsContent: View {
     @ObservedObject var engine: BackupEngine
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            header
-            Divider()
-            enableToggle
-            if engine.isBootstrapping { bootstrappingRow }
-            if engine.lowDiskSpace { lowDiskRow }
-            Divider()
-            statsGrid
-            Divider()
-            locationRow
-            if let err = engine.lastError { errorRow(err) }
-            Spacer()
-            footer
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                header
+                Divider()
+                enableToggle
+                if engine.isBootstrapping { bootstrappingRow }
+                if engine.lowDiskSpace { lowDiskRow }
+                Divider()
+                statsGrid
+                Divider()
+                locationRow
+                if let err = engine.lastError { errorRow(err) }
+                Divider()
+                footer
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
     }
 
     // MARK: - Subviews

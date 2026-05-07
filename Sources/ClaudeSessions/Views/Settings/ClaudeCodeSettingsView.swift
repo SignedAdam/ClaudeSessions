@@ -12,22 +12,24 @@ struct ClaudeCodeSettingsView: View {
     @AppStorage("embeddedChatEnabled") private var embeddedChatEnabled: Bool = true
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            header
-            Divider()
-            embeddedChatSection
-            Divider()
-            cleanupSection
-            Divider()
-            modelSection
-            Divider()
-            telemetrySection
-            Divider()
-            rawAccessSection
-            if let err = store.lastError { errorRow(err) }
-            Spacer()
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                header
+                Divider()
+                embeddedChatSection
+                Divider()
+                cleanupSection
+                Divider()
+                modelSection
+                Divider()
+                telemetrySection
+                Divider()
+                rawAccessSection
+                if let err = store.lastError { errorRow(err) }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
         .onAppear { store.load() }
     }
 

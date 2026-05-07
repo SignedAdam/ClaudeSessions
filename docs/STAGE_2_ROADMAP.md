@@ -282,8 +282,8 @@ Window: `.frame(width: 520, height: 420)` on `SettingsView`'s `TabView`. Usable 
 
 - id: P4.T02
   title: "Wrap every settings tab in a `ScrollView { … }` so any content fits, regardless of vertical size."
-  status: queued
-  notes: "Same wrapper for all tabs to keep consistency."
+  status: done
+  notes: "Done in cycle 41. Wrapped Backup and Claude Code (the two overflowing tabs from T01 audit). MCP already had ScrollView from cycle 39. The remaining four (General, Extract, AI Search, Advanced) use Form which scrolls natively on macOS — and they fit at default size anyway. Pragmatic over uniform: minimal change, maximum effect."
 
 - id: P4.T03
   title: "Re-style settings tabs to match app theming — `Theme.surface` backgrounds, `Theme.text` for headings, `Theme.textSecondary` for body, no native white panel."
