@@ -534,13 +534,13 @@ of "active" conversations they revisit constantly.
 
 - id: P9.T01
   title: "Audit existing star/favorites surfaces — confirm FavoritesStore API, sidebar Favorites section behavior, and the per-row star toggle. Document gaps to fill."
-  status: queued
-  notes: "Quick research. Output: short note in the roadmap."
+  status: done
+  notes: "Confirmed in cycle 65 decomposition: FavoritesStore singleton (toggle/add/remove/isFavorite/count, UserDefaults-backed), sidebar FavoritesSection renders only when non-empty, SessionRow has a star button. No dashboard surface today. Sidebar empty-state is implicitly handled (section hidden). Star toggle has no animation."
 
 - id: P9.T02
   title: "HomeDashboardView pinned section — add 'Starred' between the greeting and Recent Sessions (or above Recent). Show up to 8 starred sessions in the same compact pair-row layout. Click opens. Hidden when no stars."
-  status: queued
-  notes: "Reuses recentSessionsSection's row pattern. Sort: most recently modified first within the starred set."
+  status: done
+  notes: "Done in cycle 66. starredSessions computed prop (filters allSessions by favoritesStore.favoriteSessionIds, sorts by modified desc, caps at 8). starredSessionsSection mirrors recentSessionsSection's layout but with a star.fill icon on the section header AND on each row, plus a warn-tint border on rows so they pop. Inserted between quickActions and recentSessionsSection — only renders when non-empty. FavoritesStore added as @EnvironmentObject."
 
 - id: P9.T03
   title: "Sidebar Favorites empty state — when the user has 0 favorites, the section currently doesn't render. Add a one-time hint somewhere (sidebar tip below project list? or just keep current behavior?). Decide and ship."

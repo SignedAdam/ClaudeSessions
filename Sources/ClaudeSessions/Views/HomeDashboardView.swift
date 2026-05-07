@@ -5,6 +5,7 @@ import SwiftUI
 /// quick actions, and stats about your Claude Code usage.
 struct HomeDashboardView: View {
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var favoritesStore: FavoritesStore
 
     private var allSessions: [(session: SessionInfo, project: Project)] {
         appState.projects.flatMap { p in p.sessions.map { ($0, p) } }
@@ -12,6 +13,16 @@ struct HomeDashboardView: View {
 
     private var recentSessions: [(session: SessionInfo, project: Project)] {
         allSessions.sorted { $0.session.modified > $1.session.modified }.prefix(8).map { $0 }
+    }
+
+    private var starredSessions: [(session: SessionInfo, project: Project)] {
+        let favs = favoritesStore.favoriteSessionIds
+        guard !favs.isEmpty else { return [] }
+        return allSessions
+            .filter { favs.contains($0.session.id) }
+            .sorted { $0.session.modified > $1.session.modified }
+            .prefix(8)
+            .map { $0 }
     }
 
     private var topProjects: [(project: Project, count: Int)] {
@@ -35,6 +46,9 @@ struct HomeDashboardView: View {
             VStack(alignment: .leading, spacing: 28) {
                 header
                 quickActions
+                if !starredSessions.isEmpty {
+                    starredSessionsSection
+                }
                 if !recentSessions.isEmpty {
                     recentSessionsSection
                 }
@@ -173,6 +187,76 @@ struct HomeDashboardView: View {
                         .background(Theme.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Theme.border.opacity(0.3), lineWidth: 1))
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    // MARK: - Starred sessions
+
+    /// Same compact row pattern as Recent, but with a star header and a
+    /// gold-tinted star pill on each row so it's instantly readable.
+    private var starredSessionsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.warnTint)
+                Text("Starred")
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(Theme.textSecondary)
+                    .textCase(.uppercase)
+                Text("(\(starredSessions.count))")
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+
+            VStack(spacing: 4) {
+                ForEach(starredSessions, id: \.session.id) { pair in
+                    Button {
+                        Task { await appState.selectSession(pair.session) }
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Theme.warnTint)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(pair.session.title)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(Theme.text)
+                                    .lineLimit(1)
+                                HStack(spacing: 6) {
+                                    Text(pair.project.name)
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .foregroundStyle(Theme.textTertiary)
+                                    Text("·").foregroundStyle(Theme.textFaint)
+                                    Text(DateFormatting.dateString(pair.session.modified))
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .foregroundStyle(Theme.textTertiary)
+                                    if pair.session.messageCount > 0 {
+                                        Text("·").foregroundStyle(Theme.textFaint)
+                                        Text("\(pair.session.messageCount) msgs")
+                                            .font(.system(size: 10, design: .monospaced))
+                                            .foregroundStyle(Theme.textFaint)
+                                    }
+                                }
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 9))
+                                .foregroundStyle(Theme.textFaint)
+                        }
+                        .padding(.horizontal, 14).padding(.vertical, 10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Theme.surface)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(Theme.warnTint.opacity(0.25), lineWidth: 1)
+                        )
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
