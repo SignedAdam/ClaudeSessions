@@ -502,8 +502,8 @@ This phase puts the UI on top of the existing scaffolding.
 
 - id: P8.T03
   title: "Message row checkbox — render a small left-edge checkbox in user/assistant message views when isSelectMode, taps toggle via AppState. Hover/edit overlays should disable while selecting (or simply not interfere)."
-  status: queued
-  notes: "UserMessageView + AssistantMessageView. Reuse the existing message container — just inject a leading column."
+  status: done
+  notes: "Done in cycle 62. New MessageSelectionCheckbox view (checkmark.circle.fill / circle, accent vs textTertiary). UserMessageView + AssistantMessageView wrap messageContent in a checkbox+content HStack when appState.isSelectMode. Skipped on compactSummary and deleted views — those aren't selectable. The hover-button overlays don't need disabling because they only appear on hover, and tapping the checkbox doesn't pass through to the underlying content."
 
 - id: P8.T04
   title: "Select-mode header bar — slim strip across the top of ConversationView when isSelectMode, showing 'N selected · Copy · Cancel'. Cancel exits select mode and clears."

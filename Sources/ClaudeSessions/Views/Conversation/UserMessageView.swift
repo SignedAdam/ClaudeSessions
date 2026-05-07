@@ -13,6 +13,19 @@ struct UserMessageView: View {
     private var displayText: String { appState.getDisplayText(messageId: message.id, originalText: message.text) }
 
     var body: some View {
+        if appState.isSelectMode && !message.isCompactSummary && !isDeleted {
+            HStack(alignment: .top, spacing: 8) {
+                MessageSelectionCheckbox(messageId: message.id)
+                    .padding(.top, 6)
+                messageContent
+            }
+        } else {
+            messageContent
+        }
+    }
+
+    @ViewBuilder
+    private var messageContent: some View {
         if message.isCompactSummary {
             compactSummaryView
         } else if isDeleted {
