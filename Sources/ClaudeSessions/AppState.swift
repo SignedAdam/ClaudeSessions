@@ -143,6 +143,7 @@ final class AppState: ObservableObject {
         MCPNavigationTools.register(server: mcpServer, appState: self)
         MCPReadTools.register(server: mcpServer, appState: self)
         MCPOrganizeTools.register(server: mcpServer, appState: self)
+        MCPLaunchTools.register(server: mcpServer, appState: self)
     }
 
     /// Toggle the continuous-backup engine. Persists the preference too.

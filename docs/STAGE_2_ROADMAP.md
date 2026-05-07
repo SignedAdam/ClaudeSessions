@@ -236,8 +236,8 @@ with my prompt 'continue from here'" — and Claude does it via our app.
 
 - id: P3.T06
   title: "Tools: launch — `extract_and_open(session_id, mode)`, `resume_in_terminal(session_id)`."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Done in cycle 38. MCPLaunchTools.swift — extract_and_open(mode) wraps appState.extractAsNewSession / extractAsPipedPrompt; resume_in_terminal wraps ProcessLauncher.resumeSession. Both descriptions warn clients that they spawn terminals."
 
 - id: P3.T07
   title: "Setting: MCP server enable/disable + port + show the install instructions."
