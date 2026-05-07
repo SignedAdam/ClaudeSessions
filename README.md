@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="Resources/AppIcon.png" alt="Claude Sessions app icon" width="128" height="128">
+  <img src="Resources/AppIcon.png" alt="Claude Sessions amber app icon" width="118" height="118">
+  &nbsp;&nbsp;
+  <img src="Resources/AppIconViolet.png" alt="Claude Sessions violet app icon" width="118" height="118">
 </p>
 
 <h1 align="center">Claude Sessions</h1>
@@ -38,7 +40,7 @@ The main trick: **clean continuation**. Strip a massive session down to the huma
 - Continue in-app through `claude -p --resume` when you want one more turn without opening a terminal.
 - Protect transcripts with continuous backup plus an optional LaunchAgent daemon.
 - Let Claude Code control the app through an optional localhost MCP server.
-- Look good doing it: themes, ambient background, iMessage-style view, context metrics.
+- Look good doing it: themes, ambient background, iMessage-style view, context metrics, configurable Dock icon.
 
 ## Screenshots
 

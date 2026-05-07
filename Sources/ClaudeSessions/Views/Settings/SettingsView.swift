@@ -38,6 +38,7 @@ struct GeneralSettingsView: View {
     @AppStorage("displayName") private var displayName = "You"
     @AppStorage("theme") private var theme = "system"
     @AppStorage("preferredTerminal") private var preferredTerminal = "system"
+    @AppStorage(DockIconVariant.defaultsKey) private var dockIconRaw = DockIconVariant.fallback.rawValue
     @EnvironmentObject var hiddenStore: HiddenStore
     @EnvironmentObject var themeStore: ThemeStore
 
@@ -70,6 +71,8 @@ struct GeneralSettingsView: View {
                 visibilitySection
                 Divider()
                 appearanceSection
+                Divider()
+                dockIconSection
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -150,6 +153,82 @@ struct GeneralSettingsView: View {
                 .frame(maxWidth: 160)
                 Spacer()
             }
+        }
+    }
+
+    private var dockIconSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionHeader("Dock icon",
+                                  subtitle: "Choose the icon macOS shows in the Dock while Claude Sessions is running.")
+            HStack(spacing: 10) {
+                ForEach(DockIconVariant.allCases) { variant in
+                    DockIconOption(
+                        variant: variant,
+                        isSelected: dockIconRaw == variant.rawValue
+                    ) {
+                        dockIconRaw = variant.rawValue
+                        DockIconManager.apply(variant)
+                    }
+                }
+                Spacer()
+            }
+            Text("Finder still uses the bundled app icon. The Dock icon changes immediately and persists across launches.")
+                .font(.system(size: 10))
+                .foregroundStyle(Theme.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+private struct DockIconOption: View {
+    let variant: DockIconVariant
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 7) {
+                iconImage
+                    .frame(width: 56, height: 56)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: .black.opacity(0.25), radius: 6, y: 3)
+
+                Text(variant.title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(isSelected ? Theme.text : Theme.textSecondary)
+
+                Text(variant.subtitle)
+                    .font(.system(size: 9))
+                    .foregroundStyle(Theme.textTertiary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .frame(width: 96)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 9)
+            .background(isSelected ? Theme.accent.opacity(0.12) : Theme.surface.opacity(0.55))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(isSelected ? Theme.accent.opacity(0.55) : Theme.border.opacity(0.25), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .help("Use the \(variant.title) Dock icon")
+    }
+
+    @ViewBuilder
+    private var iconImage: some View {
+        if let image = DockIconManager.image(for: variant) {
+            Image(nsImage: image)
+                .resizable()
+                .scaledToFit()
+        } else {
+            Image(systemName: "app.fill")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(Theme.textTertiary)
+                .padding(10)
         }
     }
 }

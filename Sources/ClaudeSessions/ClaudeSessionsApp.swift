@@ -9,13 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // no Dock icon, no Cmd+Tab. Force regular GUI.
         NSApp.setActivationPolicy(.regular)
 
-        // Prefer the bundled asset used by the packaged .app. Fall back to
-        // the generated Swift icon when running directly from SwiftPM.
-        if let bundledIcon = NSImage(named: "AppIcon") {
-            NSApp.applicationIconImage = bundledIcon
-        } else {
-            NSApp.applicationIconImage = AppIcon.makeImage()
-        }
+        DockIconManager.applyFromDefaults()
 
         NSApp.activate(ignoringOtherApps: true)
     }
