@@ -53,7 +53,7 @@ Download the latest DMG from [Releases](https://github.com/SignedAdam/ClaudeSess
 
 Current builds are ad-hoc signed, not notarized. If macOS objects, right-click the app and choose **Open**.
 
-## Build locally
+## Build from source
 
 ```bash
 git clone https://github.com/SignedAdam/ClaudeSessions.git
@@ -61,36 +61,7 @@ cd ClaudeSessions
 swift run ClaudeSessions
 ```
 
-Package a universal macOS app, ZIP, and DMG:
-
-```bash
-./scripts/make_dmg.sh 0.1.0
-open build/Claude-Sessions-0.1.0.dmg
-```
-
-Fast local package for your current architecture only:
-
-```bash
-CURRENT_ARCH_ONLY=1 ./scripts/make_dmg.sh dev
-```
-
-## Release
-
-Push a tag. GitHub Actions builds a universal macOS DMG and publishes a Release.
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-Or build and publish from your own machine:
-
-```bash
-./scripts/make_dmg.sh 0.1.0
-gh release create v0.1.0 build/Claude-Sessions-0.1.0.dmg build/Claude-Sessions-0.1.0.zip build/SHA256SUMS.txt \
-  --title v0.1.0 \
-  --notes "Claude Sessions 0.1.0"
-```
+For bugs, ideas, and pull requests, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Privacy and safety
 
