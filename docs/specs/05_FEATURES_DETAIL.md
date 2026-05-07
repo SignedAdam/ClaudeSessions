@@ -11,9 +11,9 @@ The `ProjectScanner` service scans `~/.claude/projects/` on app launch:
    b. Scan for `*.jsonl` files at the root level of the directory
    c. For JSONL files NOT in the index, extract minimal metadata: file size, modification date, and the first user text message (read first ~50 lines, find first `type: "user"` with string content, extract first 80 characters)
    d. Convert the directory slug to a human-readable project name:
-      - `-Users-sauel-dev-shortimize-backend` → `shortimize-backend`
-      - `-Users-sauel-dev` → `dev`
-      - `-Users-sauel` → `~ (home)`
+      - `-Users-alice-dev-shortimize-backend` → `shortimize-backend`
+      - `-Users-alice-dev` → `dev`
+      - `-Users-alice` → `~ (home)`
       - Rule: take the last path component from `originalPath` in the index, or strip the common prefix from the slug
 3. Build a `[Project]` array, each containing its `[SessionInfo]` entries
 4. Sort projects alphabetically by name
@@ -89,9 +89,9 @@ Tool calls and their results should be visually associated. When a tool_use bloc
 
 ```
 ┌─ Tool: Bash — ls -la ──── 5:03 PM ──────┐
-│ ▶ ls -la /Users/sauel/dev               │
+│ ▶ ls -la /Users/alice/dev               │
 │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│
-│ ▶ total 128 drwxr-xr-x 24 sauel...      │
+│ ▶ total 128 drwxr-xr-x 24 alice...      │
 └──────────────────────────────────────────┘
 ```
 

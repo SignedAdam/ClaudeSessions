@@ -12,7 +12,7 @@ enum BackupVaultService {
     /// rotated `.orig-<unix-ts>` snapshot.
     struct Entry: Identifiable, Hashable {
         let id: String                  // path on disk
-        let projectSlug: String         // "-Users-sauel-dev-Foo"
+        let projectSlug: String         // "-Users-alice-dev-Foo"
         let sessionId: String           // UUID-or-other base name
         let isSnapshot: Bool            // true for .orig-* files
         let snapshotTimestamp: Date?    // parsed from the .orig-<ts> suffix

@@ -38,7 +38,7 @@ POST https://openrouter.ai/api/v1/chat/completions
 ```
 Authorization: Bearer <api-key>
 Content-Type: application/json
-HTTP-Referer: https://github.com/sauel/claude-sessions
+HTTP-Referer: https://github.com/SignedAdam/ClaudeSessions
 X-Title: Claude Sessions
 ```
 

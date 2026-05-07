@@ -113,7 +113,7 @@ that core: making old conversations easy to find, easy to read, easy to reuse.
 - Theme picker popover anchored to the sidebar footer (top-bar conflict with macOS drag region was unsolvable)
 
 ### App chrome
-- Custom thin top bar — traffic lights on the left, drag region across the rest, no clickable icons up there (lost the fight with macOS drag-window-on-mouseDown)
+- Custom thin top bar — traffic lights on the left, drag region across the rest; controls live outside the macOS drag-owned area
 - Sidebar footer is the central control strip: refresh, archive, hide-toggle, theme picker, settings gear, stats chip
 - Bottom bar with labeled metrics: human / claude / tools / duration, plus theme + settings icons mirrored on the right
 - Session header: title (click-to-rename with pen icon), close button, cwd path (click-to-copy)
@@ -209,7 +209,7 @@ Today we use char-count heuristics for "size of cleaned dialogue." Three options
 Default to heuristics, optionally call `count_tokens` when the user has an API key configured.
 
 ### LLM summarization
-"Summarize this conversation" using OpenRouter (we already have the key). Two flavors:
+"Summarize this conversation" using OpenRouter when configured. Two flavors:
 - Fast summary at the top of long conversations
 - **"Compress this"** — different from `clean`. Replaces bulky tool outputs with one-sentence summaries, then forks into a new resumable session. The conversation feels shorter but Claude still has the gist of what was done.
 
@@ -270,10 +270,10 @@ A Settings panel that lets users rebind any of our shortcuts.
 
 ## 🚫 Not doing
 
-- **Unit tests** — explicitly out of scope.
+- **Full test suite** — not in the current scope.
 - **Becoming a Claude client** — no chat input, no message sending. This is purely an archive / continuation tool.
 - **Custom-styled context menus** — would require building a custom popover replacement for `.contextMenu`. Deep rabbit hole, low aesthetic ROI.
-- **Theme/Settings buttons in the title bar** — gave up after multiple attempts; macOS drag region wins. They live in the sidebar footer / bottom bar instead.
+- **Theme/Settings buttons in the title bar** — deferred because macOS drag regions own that space. They live in the sidebar footer / bottom bar instead.
 - **Streaming JSONL parser** — current full-file parse is fine up to 25MB. The file size ceiling is the right answer for the long tail.
 
 ---

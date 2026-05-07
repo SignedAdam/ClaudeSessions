@@ -155,22 +155,22 @@ enum LaunchAgentInstaller {
 
     /// Find the freshly-built daemon binary alongside the running executable.
     /// In `swift run` mode that's `.build/debug/`. In a shipped app the
-    /// daemon would live inside the .app bundle's MacOS directory — same
-    /// pattern: a sibling of the running binary.
+    /// daemon lives inside `Claude Sessions.app/Contents/MacOS/` next to the
+    /// main executable.
     private static func locateDaemonBinary() -> URL? {
-        let here = Bundle.main.bundleURL.deletingLastPathComponent()
-        let sibling = here.appendingPathComponent("ClaudeSessionsBackupAgent")
-        if FileManager.default.fileExists(atPath: sibling.path) {
-            return sibling
+        let fm = FileManager.default
+
+        if let executableDir = Bundle.main.executableURL?.deletingLastPathComponent() {
+            let sibling = executableDir.appendingPathComponent("ClaudeSessionsBackupAgent")
+            if fm.fileExists(atPath: sibling.path) { return sibling }
         }
-        // Sometimes Bundle.main.bundleURL points at the executable itself,
-        // not its parent. Try the parent in that case.
-        let parent = Bundle.main.bundleURL.deletingLastPathComponent()
+
+        // Development fallback for plain SwiftPM launches.
+        let bundleSibling = Bundle.main.bundleURL
             .deletingLastPathComponent()
             .appendingPathComponent("ClaudeSessionsBackupAgent")
-        if FileManager.default.fileExists(atPath: parent.path) {
-            return parent
-        }
+        if fm.fileExists(atPath: bundleSibling.path) { return bundleSibling }
+
         return nil
     }
 

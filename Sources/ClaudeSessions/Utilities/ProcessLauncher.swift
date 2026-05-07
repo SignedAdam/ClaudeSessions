@@ -18,12 +18,17 @@ enum ProcessLauncher {
     // MARK: - Public API
 
     /// Resume an existing Claude session.
-    static func resumeSession(sessionId: String, cwd: String, displayName: String? = nil) {
-        var cmd = "claude --resume \(shellQuote(sessionId))"
-        if let n = displayName, !n.isEmpty {
-            cmd += " --name \(shellQuote(n))"
-        }
-        launch(command: cmd, cwd: cwd)
+    ///
+    /// We deliberately do NOT pass `--name` here. The session's title is
+    /// already persisted by `SessionCreator` (via `sessions-index.json` and
+    /// the JSONL `custom-title` line), so the flag is redundant. More
+    /// importantly: when `--name` is set, Claude Code's exit hint prints
+    /// the resume command using the *title* (`claude --resume "atlas continued"`)
+    /// rather than the UUID. Title-based resume is project-scoped — pasting
+    /// that command into a fresh terminal at `~` returns
+    /// `No sessions match "..."`. UUID-based resume works from any cwd.
+    static func resumeSession(sessionId: String, cwd: String) {
+        launch(command: "claude --resume \(shellQuote(sessionId))", cwd: cwd)
     }
 
     /// Start a new Claude session by piping a text prompt.
@@ -41,7 +46,7 @@ enum ProcessLauncher {
 
     /// Back-compat aliases.
     static func openInClaude(sessionId: String, projectPath: String) {
-        resumeSession(sessionId: sessionId, cwd: projectPath, displayName: nil)
+        resumeSession(sessionId: sessionId, cwd: projectPath)
     }
     static func openNewClaudeSession(projectPath: String, promptText: String) {
         newSessionFromPipedPrompt(promptText: promptText, cwd: projectPath, displayName: nil)
@@ -79,16 +84,33 @@ enum ProcessLauncher {
 
     /// Build a `.command` file containing the cd + command + an interactive
     /// shell at the end (so the window stays open), make it executable,
-    /// then ask `NSWorkspace` to open it. macOS routes the open to whatever
-    /// the user has set as the default handler for `.command` files.
+    /// then dispatch it to the user's preferred terminal.
+    ///
+    /// Routing is governed by `UserDefaults` key `preferredTerminal` (set in
+    /// Settings → General):
+    /// - `"system"` (default) — `NSWorkspace.shared.open(scriptURL)`. macOS
+    ///   routes via the `com.apple.terminal.shell-script` UTI, which only
+    ///   Terminal.app, iTerm2, and Warp claim. Ghostty does **not** register
+    ///   for this UTI, so a Ghostty user must pick it explicitly below.
+    /// - `"terminal" / "iterm" / "warp"` — `open -a <App> file.command`.
+    ///   These apps claim the `.command` UTI, so they run the script directly.
+    /// - `"ghostty"` — `open -na Ghostty.app --args --command=<script>`.
+    ///   Ghostty's macOS app only accepts launch arguments via `open --args`;
+    ///   `--command=<path>` is the documented way to run an arbitrary
+    ///   executable in a new Ghostty window.
     private static func launch(command: String, cwd: String) {
         let userShell = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
 
-        // We use ~/Library/Application Support/ClaudeSessions/launch/ rather
-        // than /tmp because some terminals (notably Ghostty) prompt the user
-        // before executing arbitrary scripts under /var/folders.
+        // We use ~/Library/Caches/ClaudeSessions/launch/ rather than
+        // ~/Library/Application Support/... or /tmp:
+        //   - /var/folders/... → Ghostty prompts the user before executing
+        //     arbitrary scripts there.
+        //   - "Application Support" contains a space, which breaks Ghostty's
+        //     `--command=<path>` (re-tokenized on whitespace inside Ghostty).
+        // ~/Library/Caches has no spaces, isn't subject to the prompt, and
+        // these scripts are short-lived (~10 min) anyway.
         let supportDir = FileManager.default
-            .urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            .urls(for: .cachesDirectory, in: .userDomainMask)
             .first!
             .appendingPathComponent("ClaudeSessions/launch", isDirectory: true)
         try? FileManager.default.createDirectory(at: supportDir, withIntermediateDirectories: true)
@@ -109,16 +131,47 @@ enum ProcessLauncher {
             return
         }
 
-        // Open with the system's default `.command` handler. Users can
-        // change this in Finder: right-click any .command → Open With →
-        // Other → <their terminal> → check "Always Open With". After that,
-        // resume / extract / open-CLI all use that terminal.
-        NSWorkspace.shared.open(scriptURL)
+        dispatchToPreferredTerminal(scriptURL: scriptURL)
 
         // Schedule cleanup ~10 minutes later. The terminal has plenty of
         // time to spawn and read the script before then.
         DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 600) {
             try? FileManager.default.removeItem(at: scriptURL)
+        }
+    }
+
+    /// Read the user's preferred-terminal choice and route the `.command`
+    /// file accordingly.
+    private static func dispatchToPreferredTerminal(scriptURL: URL) {
+        let pref = UserDefaults.standard.string(forKey: "preferredTerminal") ?? "system"
+
+        switch pref {
+        case "terminal":
+            runOpen(["-a", "Terminal", scriptURL.path])
+        case "iterm":
+            runOpen(["-a", "iTerm", scriptURL.path])
+        case "warp":
+            runOpen(["-a", "Warp", scriptURL.path])
+        case "ghostty":
+            // `open -na Ghostty.app --args --command=<path>`: spawns a new
+            // Ghostty window that runs the script. `-n` forces a new app
+            // instance; `-a Ghostty` doesn't accept files because Ghostty
+            // doesn't claim the `.command` UTI.
+            runOpen(["-na", "Ghostty", "--args", "--command=\(scriptURL.path)"])
+        default:
+            // System default — same as before this setting existed.
+            NSWorkspace.shared.open(scriptURL)
+        }
+    }
+
+    private static func runOpen(_ args: [String]) {
+        let p = Process()
+        p.launchPath = "/usr/bin/open"
+        p.arguments = args
+        do {
+            try p.run()
+        } catch {
+            NSLog("[ClaudeSessions] launcher: /usr/bin/open failed: \(error)")
         }
     }
 

@@ -21,7 +21,7 @@
 ## Notes
 
 - FileWatcher is already wired to the open conversation file (see `selectSession` in AppState) — when claude appends entries during a run, the watcher fires and the conversation re-loads automatically. So the user types → presses ⌘↩ → composer locks → claude writes → file changes → conversation refreshes with the new entries. No extra plumbing needed in this cycle.
-- I preferred `/usr/bin/env claude` over hard-coding `/Users/sauel/.local/bin/claude` so the binary resolves wherever the user has it installed (PATH-based). The PATH backfill in env handles the case where the GUI process inherits an empty PATH.
+- I preferred `/usr/bin/env claude` over hard-coding `/Users/alice/.local/bin/claude` so the binary resolves wherever the user has it installed (PATH-based). The PATH backfill in env handles the case where the GUI process inherits an empty PATH.
 - I deliberately did NOT use `--output-format stream-json` here. That belongs in P2.T04 (live append rendering with token streaming). For T03 we just spawn-and-wait and let the on-disk JSONL be the channel.
 
 ## Manual test

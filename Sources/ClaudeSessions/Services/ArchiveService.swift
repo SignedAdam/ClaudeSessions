@@ -14,7 +14,7 @@ struct ArchiveService {
         let sessionId: String
         let title: String
         let originalPath: String           // the full JSONL path where it came from
-        let originalProjectPath: String    // cwd of the original project (e.g. /Users/sauel/dev/foo)
+        let originalProjectPath: String    // cwd of the original project (e.g. /Users/alice/dev/foo)
         let originalProjectName: String    // human-readable project name at archive time
         let archivedPath: String           // current file path in the archive
         let archivedAt: Date

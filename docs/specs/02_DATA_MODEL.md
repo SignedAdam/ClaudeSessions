@@ -8,8 +8,8 @@ Claude Code stores conversations under:
 ```
 
 Where `<project-dir-slug>` is the working directory path with `/` replaced by `-`. Examples:
-- `/Users/sauel/dev` → `-Users-sauel-dev`
-- `/Users/sauel/dev/shortimize-backend` → `-Users-sauel-dev-shortimize-backend`
+- `/Users/alice/dev` → `-Users-alice-dev`
+- `/Users/alice/dev/shortimize-backend` → `-Users-alice-dev-shortimize-backend`
 
 Each project directory contains:
 - `<session-uuid>.jsonl` — conversation files (one per session)
@@ -22,11 +22,11 @@ Each project directory contains:
 ```json
 {
   "version": 1,
-  "originalPath": "/Users/sauel/dev",
+  "originalPath": "/Users/alice/dev",
   "entries": [
     {
       "sessionId": "722e20c8-...",
-      "fullPath": "/Users/sauel/.claude/projects/-Users-sauel-dev/722e20c8-....jsonl",
+      "fullPath": "/Users/alice/.claude/projects/-Users-alice-dev/722e20c8-....jsonl",
       "fileMtime": 1769189617091,
       "firstPrompt": "Hello Claude...",
       "summary": "Short Title Here",           // may be absent
@@ -34,7 +34,7 @@ Each project directory contains:
       "created": "2026-01-23T17:33:36.690Z",
       "modified": "2026-01-23T22:09:45.511Z",
       "gitBranch": "main",
-      "projectPath": "/Users/sauel/dev",
+      "projectPath": "/Users/alice/dev",
       "isSidechain": false
     }
   ]
@@ -67,7 +67,7 @@ Two variants:
   "permissionMode": "default",
   "userType": "external",
   "entrypoint": "cli",
-  "cwd": "/Users/sauel/dev",
+  "cwd": "/Users/alice/dev",
   "sessionId": "session-uuid",
   "version": "2.1.89",
   "gitBranch": "HEAD"

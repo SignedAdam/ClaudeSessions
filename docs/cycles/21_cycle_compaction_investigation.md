@@ -7,7 +7,7 @@
 - Fetched Claude Code's `/compact` docs (https://code.claude.com/docs/en/context-window) — confirms compact "replaces the conversation with a structured summary" in-memory, but doesn't say what happens on disk.
 - Fetched the settings reference for `cleanupPeriodDays` — confirms it's a hard unlink, default 30 days, minimum 1.
 - Inspected a real compacted session file on disk:
-  `~/.claude/projects/-Users-sauel-dev-AtlasNativeClaude/ebe95661-63e3-4a17-9917-db93bd8a82ad.jsonl`
+  `~/.claude/projects/-Users-alice-dev-AtlasNativeClaude/ebe95661-63e3-4a17-9917-db93bd8a82ad.jsonl`
 - Counted lines pre/post compact-summary entry, traced parent UUIDs.
 
 ## What I learned

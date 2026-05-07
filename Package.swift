@@ -4,6 +4,10 @@ import PackageDescription
 let package = Package(
     name: "ClaudeSessions",
     platforms: [.macOS(.v14)],
+    products: [
+        .executable(name: "ClaudeSessions", targets: ["ClaudeSessions"]),
+        .executable(name: "ClaudeSessionsBackupAgent", targets: ["ClaudeSessionsBackupAgent"]),
+    ],
     targets: [
         // Continuous backup engine, factored out so it can run inside the
         // app AND inside the headless daemon target without code duplication.

@@ -34,8 +34,28 @@ struct SettingsView: View {
 struct GeneralSettingsView: View {
     @AppStorage("displayName") private var displayName = "You"
     @AppStorage("theme") private var theme = "system"
+    @AppStorage("preferredTerminal") private var preferredTerminal = "system"
     @EnvironmentObject var hiddenStore: HiddenStore
     @EnvironmentObject var themeStore: ThemeStore
+
+    private var availableTerminals: [(id: String, label: String)] {
+        var items: [(String, String)] = [("system", "System default (.command handler)")]
+        let fm = FileManager.default
+        if fm.fileExists(atPath: "/System/Applications/Utilities/Terminal.app") ||
+            fm.fileExists(atPath: "/Applications/Utilities/Terminal.app") {
+            items.append(("terminal", "Terminal.app"))
+        }
+        if fm.fileExists(atPath: "/Applications/iTerm.app") {
+            items.append(("iterm", "iTerm"))
+        }
+        if fm.fileExists(atPath: "/Applications/Ghostty.app") {
+            items.append(("ghostty", "Ghostty"))
+        }
+        if fm.fileExists(atPath: "/Applications/Warp.app") {
+            items.append(("warp", "Warp"))
+        }
+        return items
+    }
 
     var body: some View {
         ScrollView {
@@ -72,8 +92,21 @@ struct GeneralSettingsView: View {
     private var terminalSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             SettingsSectionHeader("Terminal",
-                                  subtitle: "Resume / Extract / Open-in-CLI write a tiny `.command` script and let macOS open it.")
-            Text("By default that's Terminal.app. To use a different terminal, right-click any `.command` file in Finder → Open With → Other → choose your terminal → check \"Always Open With\". From then on, every launch from this app opens there.")
+                                  subtitle: "Where Resume / Supercompact / Open-in-CLI launches Claude Code.")
+            HStack(spacing: 8) {
+                Text("Preferred terminal:")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                Picker("", selection: $preferredTerminal) {
+                    ForEach(availableTerminals, id: \.id) { item in
+                        Text(item.label).tag(item.id)
+                    }
+                }
+                .labelsHidden()
+                .frame(maxWidth: 260)
+                Spacer()
+            }
+            Text("\"System default\" lets macOS route `.command` files to whatever app claims the UTI — usually Terminal.app. Ghostty does not register that UTI on macOS, so picking it explicitly here is the only way to make Resume open in Ghostty.")
                 .font(.system(size: 10))
                 .foregroundStyle(Theme.textTertiary)
                 .fixedSize(horizontal: false, vertical: true)

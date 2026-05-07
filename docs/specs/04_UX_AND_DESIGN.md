@@ -76,7 +76,7 @@ Each project is a disclosure group that expands to show its sessions:
     ...
 ```
 
-- Project names are derived from `originalPath` in `sessions-index.json`, or from the directory slug (convert `-Users-sauel-dev-shortimize-backend` → `shortimize-backend`)
+- Project names are derived from `originalPath` in `sessions-index.json`, or from the directory slug (convert `-Users-alice-dev-shortimize-backend` → `shortimize-backend`)
 - Session rows show: title/summary (from index) or first ~60 chars of first user message, and date
 - Sessions sorted by date (most recent first)
 - Currently selected session is highlighted
@@ -156,7 +156,7 @@ message text
 response text with markdown
 
 [Tool: Bash — 5:03 PM]
-ls -la /Users/sauel/dev
+ls -la /Users/alice/dev
 
 [Result — 5:03 PM]
 total 128...

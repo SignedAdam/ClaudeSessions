@@ -157,7 +157,7 @@ struct ProjectScanner {
         }
 
         // Fallback: parse from slug
-        // Slug format: -Users-sauel-dev-shortimize-backend
+        // Slug format: -Users-alice-dev-shortimize-backend
         let path = "/" + slug.dropFirst().replacingOccurrences(of: "-", with: "/")
         let name = projectNameFromPath(path)
         return (name, path)

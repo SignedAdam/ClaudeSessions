@@ -41,7 +41,7 @@ struct SessionCreator {
     /// - Parameters:
     ///   - jsonl: Pre-built JSONL content (from CleanConversationService)
     ///   - sessionId: UUID for the new session (matches sessionId inside the entries)
-    ///   - cwd: The original project cwd (e.g. `/Users/sauel/dev/Narkis`).
+    ///   - cwd: The original project cwd (e.g. `/Users/alice/dev/Narkis`).
     ///          The new JSONL is written to the corresponding `~/.claude/projects/<slug>/`.
     ///   - title: Human-readable title for `sessions-index.json.summary`
     ///   - firstPrompt: First user message text, for the index
@@ -102,11 +102,11 @@ struct SessionCreator {
     }
 
     /// Convert a filesystem cwd to Claude Code's on-disk project directory path.
-    /// Example: `/Users/sauel/dev/Narkis` → `~/.claude/projects/-Users-sauel-dev-Narkis`
-    /// Example: `/Users/sauel/.hermes` → `~/.claude/projects/-Users-sauel--hermes`
+    /// Example: `/Users/alice/dev/Narkis` → `~/.claude/projects/-Users-alice-dev-Narkis`
+    /// Example: `/Users/alice/.hermes` → `~/.claude/projects/-Users-alice--hermes`
     ///
     /// Claude Code's slug algorithm: replace BOTH `/` and `.` with `-`.
-    /// That is why `/Users/sauel/.hermes` becomes `-Users-sauel--hermes` (double dash from the dot).
+    /// That is why `/Users/alice/.hermes` becomes `-Users-alice--hermes` (double dash from the dot).
     func projectDirectory(forCwd cwd: String) -> String {
         let home = FileManager.default.homeDirectoryForCurrentUser.path
         var slug = cwd
@@ -334,7 +334,6 @@ struct SessionCreator {
     /// If a `custom-title` line already exists anywhere in the file, replace
     /// its `customTitle`. Otherwise prepend a new line.
     private func upsertCustomTitleLine(jsonlPath: String, sessionId: String, title: String) {
-        let fm = FileManager.default
         guard let raw = try? String(contentsOfFile: jsonlPath, encoding: .utf8) else { return }
 
         let titleEntry: [String: Any] = [

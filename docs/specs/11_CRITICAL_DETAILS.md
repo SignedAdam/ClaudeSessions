@@ -75,9 +75,9 @@ A `ToolInteraction` renders as a single card with both the call and result insid
 
 ```
 ┌─ Tool: Bash — List dev directory contents ─── 5:03 PM ─┐
-│ ▶ ls -la /Users/sauel/dev                              │ ← collapsed call
+│ ▶ ls -la /Users/alice/dev                              │ ← collapsed call
 │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
-│ ▶ total 128 drwxr-xr-x 24 sauel staff 768 Apr 5...    │ ← collapsed result
+│ ▶ total 128 drwxr-xr-x 24 alice staff 768 Apr 5...    │ ← collapsed result
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -87,15 +87,15 @@ Both sections independently expand/collapse. The divider between them is a dashe
 
 The directory slug encodes the full filesystem path:
 ```
--Users-sauel-dev-shortimize-backend  →  /Users/sauel/dev/shortimize-backend
+-Users-alice-dev-shortimize-backend  →  /Users/alice/dev/shortimize-backend
 ```
 
 To get a human-readable name:
 
 1. **Preferred:** If `sessions-index.json` exists and has `originalPath`, use the last path component:
-   - `originalPath: "/Users/sauel/dev/shortimize-backend"` → `"shortimize-backend"`
-   - `originalPath: "/Users/sauel/dev"` → `"dev"`
-   - `originalPath: "/Users/sauel"` → `"~ (home)"`
+   - `originalPath: "/Users/alice/dev/shortimize-backend"` → `"shortimize-backend"`
+   - `originalPath: "/Users/alice/dev"` → `"dev"`
+   - `originalPath: "/Users/alice"` → `"~ (home)"`
 
 2. **Fallback:** Parse the slug:
    - Remove the leading `-`

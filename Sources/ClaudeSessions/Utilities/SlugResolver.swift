@@ -14,7 +14,7 @@ import Foundation
 /// and return the first candidate that exists on disk.
 enum SlugResolver {
 
-    /// Given a slug like `-Users-sauel-dev-claude-convo-viewer-ClaudeSessions`,
+    /// Given a slug like `-Users-alice-dev-claude-convo-viewer-ClaudeSessions`,
     /// return the real path on disk if exactly one candidate exists. Falls
     /// back to the all-slashes interpretation when nothing exists (caller
     /// can still try it; better than nothing).

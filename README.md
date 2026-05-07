@@ -1,0 +1,112 @@
+<p align="center">
+  <img src="docs/images/screenshot-reading-stellar.png" alt="Claude Sessions screenshot" width="920">
+</p>
+
+<h1 align="center">Claude Sessions</h1>
+
+<p align="center">
+  A native macOS command center for Claude Code conversations.
+</p>
+
+<p align="center">
+  <a href="https://github.com/SignedAdam/ClaudeSessions/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/SignedAdam/ClaudeSessions/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="macOS" src="https://img.shields.io/badge/macOS-14%2B-black?logo=apple">
+  <img alt="Swift" src="https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift&logoColor=white">
+  <img alt="SwiftUI" src="https://img.shields.io/badge/SwiftUI-native-blue">
+  <img alt="Dependencies" src="https://img.shields.io/badge/dependencies-zero-brightgreen">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-gold">
+</p>
+
+Claude Code writes everything to JSONL. Good. Then it buries the useful parts under tool calls, snapshots, system events, and cleanup rules.
+
+Claude Sessions makes the archive usable: browse it, search it, favorite it, edit it, export it, protect it, and fork clean continuations back into Claude Code.
+
+The main trick: **clean continuation**. Strip a massive session down to the human ↔ assistant dialogue, keep the parent chain valid, write a fresh resumable JSONL, and open it with `claude --resume`. A million-token working mess can become a 30–40k-token conversation without asking an LLM to summarize your history.
+
+## What it does
+
+- Browse every `~/.claude/projects/*.jsonl` conversation by project.
+- Read in Chat, Reading, or raw JSON mode.
+- Hide, archive, trash, favorite, rename, and copy sessions.
+- Edit user or assistant messages safely: saves fork into a new session; the original survives.
+- Supercompact a session into a new Claude Code continuation.
+- Export to Markdown, JSON, Codex CLI, or Gemini CLI.
+- Continue in-app through `claude -p --resume` when you want one more turn without opening a terminal.
+- Protect transcripts with continuous backup plus an optional LaunchAgent daemon.
+- Let Claude Code control the app through an optional localhost MCP server.
+- Look good doing it: themes, ambient background, iMessage-style view, context metrics.
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/images/screenshot-reading-studio.png" alt="Studio theme" width="48%">
+  <img src="docs/images/screenshot-reading-vellum.png" alt="Vellum theme" width="48%">
+</p>
+
+<p align="center">
+  <img src="docs/images/screenshot-onboarding.png" alt="Onboarding" width="70%">
+</p>
+
+## Install
+
+Download the latest DMG from [Releases](https://github.com/SignedAdam/ClaudeSessions/releases), drag the app to Applications, run it.
+
+Current builds are ad-hoc signed, not notarized. If macOS objects, right-click the app and choose **Open**.
+
+## Build locally
+
+```bash
+git clone https://github.com/SignedAdam/ClaudeSessions.git
+cd ClaudeSessions
+swift run ClaudeSessions
+```
+
+Package a universal macOS app, ZIP, and DMG:
+
+```bash
+./scripts/make_dmg.sh 0.1.0
+open build/Claude-Sessions-0.1.0.dmg
+```
+
+Fast local package for your current architecture only:
+
+```bash
+CURRENT_ARCH_ONLY=1 ./scripts/make_dmg.sh dev
+```
+
+## Release
+
+Push a tag. GitHub Actions builds a universal macOS DMG and publishes a Release.
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Or build and publish from your own machine:
+
+```bash
+./scripts/make_dmg.sh 0.1.0
+gh release create v0.1.0 build/Claude-Sessions-0.1.0.dmg build/Claude-Sessions-0.1.0.zip build/SHA256SUMS.txt \
+  --title v0.1.0 \
+  --notes "Claude Sessions 0.1.0"
+```
+
+## Privacy and safety
+
+- Local-first. Reads Claude Code files from `~/.claude/projects/`.
+- No database. No cloud service. No telemetry.
+- OpenRouter is optional and only used for AI search if you add a key.
+- MCP is disabled by default and binds to `127.0.0.1` only.
+- Destructive actions use Archive or macOS Trash where possible.
+- Edits fork. They do not overwrite your original session.
+
+## Requirements
+
+- macOS 14+
+- Xcode command line tools / Swift 5.9+
+- Claude Code CLI for resume, clean continuation, and embedded chat features
+
+## License
+
+MIT. See [LICENSE](LICENSE).

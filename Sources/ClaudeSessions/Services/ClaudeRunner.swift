@@ -12,7 +12,7 @@ import Foundation
 /// Cancellation: callers store the active runner instance and call
 /// `cancel()` to send SIGINT, then SIGTERM after a grace period. The
 /// in-flight `run()` returns with `.cancelled`.
-final class ClaudeRunner {
+final class ClaudeRunner: @unchecked Sendable {
 
     enum RunOutcome {
         case success(stdout: String)
