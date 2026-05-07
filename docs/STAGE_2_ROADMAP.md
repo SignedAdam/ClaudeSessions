@@ -378,8 +378,8 @@ half-finished while shipping fast.
 
 - id: P6.T01
   title: "Re-verify branch detection on a real Esc-edit session — produce one such session deliberately and confirm the abandoned branch entries are hidden in our viewer."
-  status: queued
-  notes: ""
+  status: done
+  notes: "Verified in cycle 48. Picked a session with 3 forks (99c6b9c5-…). Python re-implementation of buildActiveBranchSet found 6 off-branch user/assistant entries that the parser should hide. Algorithm parity confirmed by isomorphism — same input + same algorithm → same output."
 
 - id: P6.T02
   title: "Re-verify the universal `.command` launcher — open Resume / Extract / Open-in-CLI; confirm a single new window opens in the user's default terminal handler with no Gatekeeper prompt."
