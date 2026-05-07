@@ -6,6 +6,8 @@ struct ConversationView: View {
 
     private let topAnchorId = "conversation-top"
 
+    private let bottomAnchorId = "conversation-bottom"
+
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -18,7 +20,9 @@ struct ConversationView: View {
                         render(item)
                     }
 
-                    Spacer().frame(height: 8)
+                    Spacer()
+                        .frame(height: 8)
+                        .id(bottomAnchorId)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
@@ -27,6 +31,14 @@ struct ConversationView: View {
             .background(Color.clear)
             .onChange(of: conversation.sessionId) { _, _ in
                 proxy.scrollTo(topAnchorId, anchor: .top)
+            }
+            // When new messages arrive (live append from claude -p), bring
+            // the latest one into view. Animated.
+            .onChange(of: appState.lastAppendAt) { _, _ in
+                guard !appState.recentlyArrivedMessageIds.isEmpty else { return }
+                withAnimation(.easeOut(duration: 0.35)) {
+                    proxy.scrollTo(bottomAnchorId, anchor: .bottom)
+                }
             }
         }
     }
@@ -43,8 +55,22 @@ struct ConversationView: View {
                 timestampRaw: data.timestampRaw
             )
         case .message(let msg):
+            let isFresh = appState.recentlyArrivedMessageIds.contains(msg.id)
             MessageView(message: msg)
                 .id(msg.id)
+                // "Just arrived" highlight: a soft accent-tinted strip on
+                // the leading edge that fades out after the freshness
+                // window. More reliable in a LazyVStack than a transition
+                // animation (LazyVStack doesn't always pick those up).
+                .overlay(alignment: .leading) {
+                    if isFresh {
+                        Rectangle()
+                            .fill(Theme.accent)
+                            .frame(width: 2)
+                            .transition(.opacity)
+                    }
+                }
+                .animation(.easeOut(duration: 0.45), value: isFresh)
         }
     }
 

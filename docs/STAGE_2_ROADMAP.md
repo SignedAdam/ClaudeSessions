@@ -151,8 +151,8 @@ Tested live against a real session in this project. Findings:
 
 - id: P2.T04
   title: "Live append rendering — when the watched JSONL grows during a run, render the new entries with a subtle 'new' fade-in. Auto-scroll to bottom unless the user has scrolled up."
-  status: queued
-  notes: "FileWatcher already detects writes; need partial parse + diff-merge into displayMessages."
+  status: done
+  notes: "Done in cycle 30. AppState diffs displayMessages on reload to compute newly-arrived ids and bumps lastAppendAt. ConversationView auto-scrolls to bottom on lastAppendAt change. Newly-arrived messages get a soft 2pt accent strip on their leading edge that fades out after 1.5s. The user-scrolled-up case is not specifically detected — auto-scroll always fires on append. Acceptable for v1; can add scroll-position detection later if it bites."
 
 - id: P2.T05
   title: "Cancel run — a Stop button while the subprocess is alive. Sends SIGINT, then SIGTERM if it doesn't quit."

@@ -74,6 +74,14 @@ final class AppState: ObservableObject {
     @Published var isComposerSending: Bool = false
     @AppStorage("embeddedChatEnabled") var embeddedChatEnabled: Bool = true
 
+    /// IDs of display messages that just arrived from a JSONL append.
+    /// Cleared ~1.5s after they show up. Used by ConversationView to fade
+    /// new bubbles in and trigger an auto-scroll. Empty during normal
+    /// loads (e.g. switching to a different session).
+    @Published var recentlyArrivedMessageIds: Set<String> = []
+    /// Bumped whenever new messages arrive so views can react via onChange.
+    @Published var lastAppendAt: Date = .distantPast
+
     /// Cached metrics for the currently open conversation. Recomputed on
     /// `selectSession` so it stays in sync.
     @Published private(set) var contextMetrics: ContextMetrics.Result?
@@ -250,9 +258,40 @@ final class AppState: ObservableObject {
         }
 
         if let (conversation, modDate) = loaded {
+            // Diff to find newly-arrived messages (live appends from
+            // claude -p, file watcher reloads, etc.). Skip the diff if
+            // we're loading a different session or the previous load is
+            // empty — those aren't "appends" from the user's perspective.
+            let priorIds: Set<String>? = {
+                guard let prior = currentConversation,
+                      prior.sessionId == conversation.sessionId,
+                      !prior.displayMessages.isEmpty
+                else { return nil }
+                return Set(prior.displayMessages.map(\.id))
+            }()
+            let newIds: Set<String> = {
+                guard let priorIds else { return [] }
+                let currentIds = Set(conversation.displayMessages.map(\.id))
+                return currentIds.subtracting(priorIds)
+            }()
+
             currentConversation = conversation
             resetEditState()
             isJSONMode = false
+
+            if !newIds.isEmpty {
+                recentlyArrivedMessageIds = newIds
+                lastAppendAt = Date()
+                // Clear the "new" flag after the fade-in window so the
+                // animation doesn't re-fire if anything else triggers a
+                // re-render.
+                Task { [weak self] in
+                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    await MainActor.run {
+                        self?.recentlyArrivedMessageIds.subtract(newIds)
+                    }
+                }
+            }
 
             conversationCache[sessionId] = CachedConversation(
                 conversation: conversation, fileModDate: modDate, lastAccessed: Date()
