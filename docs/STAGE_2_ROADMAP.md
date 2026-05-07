@@ -177,8 +177,42 @@ with my prompt 'continue from here'" — and Claude does it via our app.
 
 - id: P3.T01
   title: "Decide MCP transport — stdio (spawned per-client) vs HTTP (long-running)."
-  status: queued
-  notes: "HTTP on localhost is friendlier for our case (we're already a long-running app). Document the choice."
+  status: done
+  notes: "Done in cycle 33. Decision: HTTP on localhost (Streamable HTTP variant, no SSE). See findings below."
+
+#### Findings (cycle 33 — MCP transport)
+
+**Decision: HTTP on localhost. Default port 7531, configurable. JSON-RPC 2.0 over POST. No SSE — the spec's Streamable HTTP variant covers our needs.**
+
+#### Why HTTP over stdio
+
+- **The app is already running.** Claude Sessions is a long-lived GUI process that holds the in-memory state Claude wants to act on (open session id, sidebar selection, etc.). HTTP on localhost lets the running app *be* the server. A stdio server would have to be a separate process and IPC back to the GUI for any state-touching operation, doubling the moving parts.
+- **Some tools require the GUI process.** `open_session`, `close_session`, `extract_and_open` mutate visible UI state. A stdio subprocess can't do those without round-tripping to the GUI anyway.
+- **HTTP is debuggable.** `curl http://localhost:7531/mcp -d '{...}'` works for sanity checks; stdio needs a wrapping harness.
+- **Single client semantics are fine for now.** Claude Code is the only practical MCP client right now; we don't need stdio's "one process per client" isolation.
+
+#### Why localhost only, no auth
+
+- The transport binds to `127.0.0.1` only — never `0.0.0.0` — so no other host on the network can reach it.
+- Anyone with code execution on the user's Mac can talk to it, but they can also already read `~/.claude/` and the JSONLs directly. We're not increasing the blast radius.
+- Future: add a per-launch random token in a header if we ever bind beyond loopback.
+
+#### Wire format
+
+- JSON-RPC 2.0. One endpoint: `POST /mcp`. Body is a JSON-RPC request; response is the matching JSON-RPC reply.
+- We do NOT need server-sent events for the initial cut. None of our planned tools stream — they're all point-in-time RPC calls (list, read, mutate). If we later add a `subscribe_to_session_changes` tool, we'll add SSE then.
+- Standard MCP methods we'll implement: `initialize`, `tools/list`, `tools/call`. Notifications optional.
+
+#### Default port choice
+
+- 7531 — not in IANA's well-known range, not commonly used, mnemonic ("ses" = sessions, ish). Configurable via Settings → MCP tab (P3.T07).
+- On bind failure (port taken): try ephemeral via `port: 0`, surface the chosen port in Settings.
+
+#### Implications for the rest of Phase 3
+
+- **T02 skeleton:** `Services/MCPServer.swift` — Foundation `URLSessionStreamTask` won't work for a server. Use `Network.framework` (`NWListener`/`NWConnection`) — Apple-blessed, no external deps, matches the no-deps rule.
+- **T03–T06 tools:** plain handler functions taking decoded params, returning Codable result types. Wrapper turns them into MCP tool descriptors.
+- **T07 settings:** enable/disable toggle + port field + a "Copy MCP config snippet" button that emits the right JSON for `~/.claude/settings.json`'s `mcpServers` block.
 
 - id: P3.T02
   title: "MCPServer skeleton — `Services/MCPServer.swift` that listens on a localhost port, parses JSON-RPC, dispatches to handlers."
