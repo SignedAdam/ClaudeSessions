@@ -578,8 +578,8 @@ session — today they hide unless you expand the parent.
 
 - id: P10.T01
   title: "Audit scan-root and subagent surfaces — locate every hardcoded ~/.claude/projects/ reference, confirm the slug/path collision risk across roots, and inventory how subagents are currently rendered. Document gaps."
-  status: queued
-  notes: "Findings already partly cataloged: ProjectScanner.swift line 6 is the single hardcoded root; SlugResolver assumes one root; FSEvents in BackupEngine watches that one path. Subagents shown in sidebar only via SessionRow indented under parent. No standalone view. T01 just confirms and writes it up — no code."
+  status: done
+  notes: "Done in cycle 71. Hardcoded reads of ~/.claude/projects/: ProjectScanner.swift:4-7 (the only structural root), VersionHistoryService.swift:79 (live source), SessionCreator.swift:115 (write target for new/restored sessions), BackupEngine.swift:37 (FSEvents watch path). Many doc-comment-only mentions in AppState/ArchiveService/MCP tools — those are descriptive, not load-bearing. SlugResolver does *not* hardcode the root (it checks FS reality), but it doesn't know about multiple roots either — slug→cwd works fine, but two roots could host the same slug. Project.id is just the slug string (DisplayModels.swift:6) — must become rootHash:slug to avoid SwiftUI ForEach diffing collisions across roots. Subagents: stitched into SessionInfo.subagents by ProjectScanner.swift:91-126; rendered ONLY as indented children of the parent in SidebarView.swift:384-401. No standalone surface, no cross-session aggregation, no agent-name extraction. Phase 10 plan stands as decomposed."
 
 - id: P10.T02
   title: "ScanRootStore — UserDefaults-backed singleton holding the extra scan-root URLs (default `~/.claude/projects/` is implicit and always included). API: roots(), addRoot(URL), removeRoot(URL), persisted across launches."
